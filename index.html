@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interaktiver Wärmepumpen-Budgetrechner | Powered by OSION Solution XR</title>
+
+  <style>
+    :root{
+      --bg0:#06060a;
+      --bg1:#0b0b12;
+      --card:#0f1017cc;
+      --stroke:#ffffff1a;
+      --stroke2:#ffffff2a;
+      --text:#f3f4f6;
+      --muted:#c7cad1;
+      --muted2:#a9afba;
+      --shadow: 0 30px 80px rgba(0,0,0,.55);
+      --shadow2: 0 12px 40px rgba(0,0,0,.5);
+      --radius: 26px;
+      --radius2: 20px;
+      --accent1:#b3003c;
+      --accent2:#6b2cff;
+      --accentGlow: 0 0 0 2px rgba(179,0,60,.35), 0 0 40px rgba(107,44,255,.25), 0 0 90px rgba(179,0,60,.18);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 20%, rgba(107,44,255,.24), transparent 60%),
+        radial-gradient(900px 700px at 90% 10%, rgba(179,0,60,.22), transparent 55%),
+        radial-gradient(900px 700px at 80% 90%, rgba(107,44,255,.18), transparent 58%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:46px 18px;
+    }
+
+    .shell{
+      width:min(1180px, 100%);
+      border-radius: calc(var(--radius) + 8px);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero{
+      position:relative;
+      padding:22px 26px 18px 26px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.55)),
+        url("osion-header.png") center 18% / cover no-repeat;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      min-height: 150px;
+    }
+
+    .brandRow{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      width:100%;
+    }
+
+    .brandBadge{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:14px 16px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow2);
+      max-width:100%;
+    }
+
+    .brandBadge img{
+      width:72px;
+      height:72px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      padding:6px;
+      object-fit:contain;
+    }
+
+    .brandText{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    .kicker{
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color: rgba(255,255,255,.78);
+      white-space:nowrap;
+    }
+    .title{
+      font-size:28px;
+      font-weight:800;
+      line-height:1.05;
+      text-shadow: 0 6px 30px rgba(0,0,0,.5);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .pill{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      font-weight:700;
+      color: rgba(255,255,255,.90);
+      white-space:nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--accent1);
+      box-shadow: 0 0 0 4px rgba(179,0,60,.18);
+    }
+
+    .subRow{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .subText{
+      color: rgba(255,255,255,.84);
+      font-size:14px;
+    }
+    .progressWrap{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 260px;
+      flex: 1 1 260px;
+      justify-content:flex-end;
+    }
+    .progressBar{
+      width:min(420px, 100%);
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.14);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .progressFill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(107,44,255,.95), rgba(179,0,60,.95));
+      box-shadow: 0 0 30px rgba(179,0,60,.25);
+    }
+    .stepLabel{
+      font-size:12px;
+      color: rgba(255,255,255,.80);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .content{
+      padding: 22px 26px 18px 26px;
+      background:
+        radial-gradient(900px 340px at 10% 30%, rgba(107,44,255,.10), transparent 55%),
+        radial-gradient(900px 340px at 90% 40%, rgba(179,0,60,.10), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.60));
+    }
+
+    .panel{
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(10,10,14,.55);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+
+    .panelHead{
+      padding:18px 18px 12px 18px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+    }
+
+    .qWrap{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
+    }
+    .question{
+      font-size:22px;
+      font-weight:850;
+      margin:0;
+      line-height:1.15;
+    }
+    .hint{
+      font-size:13px;
+      color: rgba(255,255,255,.72);
+      margin:0;
+    }
+
+    .panelBody{
+      padding:16px 18px 18px 18px;
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+    .grid.cols-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    @media (max-width: 980px){
+      .grid.cols-3{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px){
+      .grid.cols-2, .grid.cols-3{ grid-template-columns: 1fr; }
+      .title{ font-size:22px; }
+      .hero{ min-height: 170px; }
+      .pill{ margin-left:0; }
+      .progressWrap{ justify-content:flex-start; }
+    }
+
+    .opt{
+      position:relative;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(800px 220px at 20% 30%, rgba(107,44,255,.22), transparent 60%),
+        radial-gradient(700px 260px at 90% 40%, rgba(179,0,60,.20), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.08));
+      box-shadow: 0 18px 55px rgba(0,0,0,.35);
+      padding:18px 18px;
+      cursor:pointer;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, filter .15s ease;
+      min-height: 88px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      outline:none;
+      user-select:none;
+    }
+    .opt:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.22);
+      filter: brightness(1.03);
+    }
+    .opt[aria-selected="true"]{
+      border-color: rgba(179,0,60,.60);
+      box-shadow: var(--accentGlow);
+    }
+
+    .optText{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+      min-width:0;
+    }
+    .optMain{
+      font-size:18px;
+      font-weight:850;
+      color: rgba(255,255,255,.96);
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    .chev{
+      width:40px;height:40px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.92);
+      flex:0 0 auto;
+    }
+    .chev svg{ width:18px;height:18px; opacity:.95; }
+
+    .panelFoot{
+      padding:14px 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.03));
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      padding:12px 14px;
+      font-weight:850;
+      color: rgba(255,255,255,.95);
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.14);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.14);
+      border-color: rgba(255,255,255,.20);
+    }
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none;
+    }
+    .btnPrimary{
+      background: linear-gradient(90deg, rgba(107,44,255,.92), rgba(179,0,60,.92));
+      border-color: rgba(255,255,255,.12);
+      box-shadow: 0 14px 40px rgba(179,0,60,.20);
+    }
+    .btnPrimary:hover{
+      background: linear-gradient(90deg, rgba(107,44,255,1), rgba(179,0,60,1));
+    }
+
+    .meta{
+      font-size:12px;
+      color: rgba(255,255,255,.72);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .resultBox{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:16px 16px;
+    }
+    .resultHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .resultTitle{
+      font-size:20px;
+      font-weight:900;
+      margin:0;
+    }
+    .resultTotal{
+      font-size:22px;
+      font-weight:950;
+      margin:0;
+      letter-spacing:.02em;
+    }
+
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:14px;
+    }
+    .table td{
+      padding:10px 0;
+      border-top: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.88);
+    }
+    .table td:last-child{
+      text-align:right;
+      font-weight:850;
+      color: rgba(255,255,255,.95);
+      white-space:nowrap;
+      padding-left:14px;
+    }
+
+    .note{
+      font-size:12px;
+      color: rgba(255,255,255,.70);
+      margin-top:12px;
+      line-height:1.35;
+    }
+
+    .footer{
+      text-align:center;
+      padding: 12px 10px 18px;
+      font-size:12px;
+      color: rgba(255,255,255,.62);
+    }
+
+    /* Slider Block (Wohnfläche/Deckenhöhe) */
+    .customBox{
+      margin-top:14px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(700px 220px at 10% 30%, rgba(107,44,255,.14), transparent 58%),
+        radial-gradient(700px 220px at 90% 40%, rgba(179,0,60,.12), transparent 58%),
+        rgba(0,0,0,.18);
+      padding:14px 14px;
+    }
+    .customTitleRow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .customTitle{
+      font-size:16px;
+      font-weight:900;
+      margin:0;
+    }
+    .customLive{
+      font-size:14px;
+      font-weight:900;
+      margin:0;
+      color: rgba(255,255,255,.92);
+      white-space:nowrap;
+    }
+    .sliders{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:14px;
+      margin-top:10px;
+    }
+    @media (max-width: 980px){
+      .sliders{ grid-template-columns: 1fr; }
+    }
+    .sItem{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      padding:12px 12px;
+    }
+    .sLabel{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      color: rgba(255,255,255,.82);
+      font-weight:850;
+      margin-bottom:8px;
+    }
+    .sValue{
+      color: rgba(255,255,255,.95);
+      font-weight:950;
+      white-space:nowrap;
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--accent2);
+    }
+    .applyRow{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <header class="hero">
+        <div class="brandRow">
+          <div class="brandBadge">
+            <img src="MGU-0015%20Logo%20OSION%20Solution%20XR.png" alt="OSION Solution XR" />
+            <div class="brandText">
+              <div class="kicker">Powered by OSION Solution XR</div>
+              <div class="title">Interaktiver Wärmepumpen-Budgetrechner</div>
+            </div>
+          </div>
+
+          <div class="pill" title="Unverbindliche Kostenschätzung">
+            <span class="dot"></span>
+            Unverbindlich
+          </div>
+        </div>
+
+        <div class="subRow">
+          <div class="subText">
+            Unverbindliche Kostenschätzung auf Basis Ihrer Auswahl. Keine Preisgarantie.
+          </div>
+          <div class="progressWrap">
+            <div class="progressBar" aria-hidden="true">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="stepLabel" id="stepLabel">Schritt 1 von …</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="panel" aria-live="polite">
+          <div class="panelHead">
+            <div class="qWrap">
+              <h2 class="question" id="question">…</h2>
+              <p class="hint" id="hint">Bitte wählen Sie eine Option.</p>
+            </div>
+            <div class="meta" id="metaRight"> </div>
+          </div>
+
+          <div class="panelBody">
+            <div class="grid cols-2" id="options"></div>
+
+            <!-- Custom-Block: nur im Wohnflächen-Schritt sichtbar -->
+            <div id="areaCustomWrap" style="display:none;">
+              <div class="customBox">
+                <div class="customTitleRow">
+                  <p class="customTitle">Individuell</p>
+                  <p class="customLive" id="areaLive">–</p>
+                </div>
+
+                <p class="hint" style="margin:0; color:rgba(255,255,255,.78);">
+                  Stellen Sie Wohnfläche und Deckenhöhe ein. Daraus wird die überschlägige Heizleistung abgeleitet.
+                </p>
+
+                <div class="sliders">
+                  <div class="sItem">
+                    <div class="sLabel">
+                      <span>Wohnfläche</span>
+                      <span class="sValue" id="areaVal">120 m²</span>
+                    </div>
+                    <input id="areaRange" type="range" min="40" max="300" step="5" value="120" />
+                  </div>
+
+                  <div class="sItem">
+                    <div class="sLabel">
+                      <span>Deckenhöhe</span>
+                      <span class="sValue" id="heightVal">2,4 m</span>
+                    </div>
+                    <input id="heightRange" type="range" min="2.2" max="3.2" step="0.1" value="2.4" />
+                  </div>
+                </div>
+
+                <div class="applyRow">
+                  <button class="btn btnPrimary" type="button" id="applyAreaBtn">
+                    Werte übernehmen
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+
+                <p class="note" style="margin-top:10px">
+                  Hinweis: Überschlägige Berechnung. Für eine exakte Auslegung ist eine Heizlastberechnung erforderlich.
+                </p>
+              </div>
+            </div>
+
+            <div id="result" style="display:none; margin-top:16px;">
+              <div class="resultBox">
+                <div class="resultHead">
+                  <p class="resultTitle">Preisinformation</p>
+                  <p class="resultTotal" id="totalOut">–</p>
+                </div>
+
+                <p class="hint" style="margin:0 0 8px 0; color:rgba(255,255,255,.78);">
+                  Unverbindliche Kostenschätzung auf Basis Ihrer Auswahl. Ergebnis dient als Orientierung und ersetzt keine Planung vor Ort.
+                </p>
+
+                <table class="table" aria-label="Kostenaufteilung">
+                  <tbody>
+                    <tr>
+                      <td>Wärmepumpe (Gerät + Zubehör)</td>
+                      <td id="cDevice">–</td>
+                    </tr>
+                    <tr>
+                      <td>Installation / Montage / Hydraulik</td>
+                      <td id="cInstall">–</td>
+                    </tr>
+                    <tr>
+                      <td>Elektroarbeiten (Anschluss / Absicherung)</td>
+                      <td id="cElec">–</td>
+                    </tr>
+                    <tr>
+                      <td>Umbauten am Heizsystem (z. B. Heizkörper/Anpassungen)</td>
+                      <td id="cSystem">–</td>
+                    </tr>
+                    <tr>
+                      <td>Planung / Inbetriebnahme / Einregulierung</td>
+                      <td id="cPlan">–</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="resultHead" style="margin-top:14px">
+                  <p class="resultTitle">Technische Orientierung</p>
+                  <p class="resultTotal" id="kwOut">–</p>
+                </div>
+
+                <table class="table" aria-label="Technische Orientierung">
+                  <tbody>
+                    <tr>
+                      <td>Überschlägige Heizleistung</td>
+                      <td id="cKw">–</td>
+                    </tr>
+                    <tr>
+                      <td>Geschätzter Stromverbrauch pro Jahr</td>
+                      <td id="cKwh">–</td>
+                    </tr>
+                    <tr>
+                      <td>Geschätzte Stromkosten pro Jahr</td>
+                      <td id="cCost">–</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- NUR EIN CTA -->
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;">
+                  <a class="btn btnPrimary" id="ctaLink" href="https://elitebau-hamburg.de/kontakt" target="_blank" rel="noopener">
+                    Kostenlose Vor-Ort-Einschätzung anfragen
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+
+                <div class="note">
+                  Unverbindliche Kostenschätzung. Keine Preisgarantie. Abweichungen sind durch Zustand, Leitungen, Heizflächen, Vorlauftemperatur, Fundament/Schallschutz und Elektro möglich.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panelFoot">
+            <button class="btn" id="backBtn" type="button">
+              <span aria-hidden="true">←</span> Zurück
+            </button>
+
+            <div class="meta" id="footerMeta"> </div>
+          </div>
+        </section>
+
+        <div class="footer">
+          © OSION Solution XR – Unverbindliche Kostenschätzung. Keine Preisgarantie.
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // Konfiguration
+    // =========================
+    const CTA_URL = "https://elitebau-hamburg.de/kontakt";
+
+    // Baseline-Invest (Luft/Wasser) als Orientierung:
+    // Viele Quellen nennen grob ~27–40k inkl. Einbau (abhängig von Leistung/Umfang).
+    // Wir nutzen intern eine Min/Max-Kalibrierung für die Ein-Punkt-Ausgabe (keine Spanne im UI).
+    const PRICE_MIN = 26000;
+    const PRICE_MAX = 42000;
+
+    // Kosten-Split (Summe = 1.00)
+    const split = {
+      device:  0.40,
+      install: 0.27,
+      elec:    0.10,
+      system:  0.13,
+      plan:    0.10
+    };
+
+    // =========================
+    // Steps
+    // =========================
+    const steps = [
+      {
+        id: "ownership",
+        question: "Sind Sie Eigentümer oder Mieter?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-2",
+        options: [
+          { value:"owner", label:"Eigentümer", score:0.00 },
+          { value:"renter", label:"Mieter", score:0.10 }
+        ]
+      },
+      {
+        id: "buildingType",
+        question: "Welcher Gebäudetyp ist es?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:"sfh", label:"Einfamilienhaus", score:0.10 },
+          { value:"th",  label:"Reihenhaus", score:0.06 },
+          { value:"mfh", label:"Mehrfamilienhaus", score:0.18 }
+        ]
+      },
+      {
+        id: "projectType",
+        question: "Geht es um Neubau oder Bestand (Heizungstausch)?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-2",
+        options: [
+          { value:"new", label:"Neubau", score:0.00, add: 0 },
+          { value:"retro", label:"Bestand / Tausch", score:0.18, add: 1800 }
+        ]
+      },
+      {
+        id: "year",
+        question: "Baujahr / energetischer Zustand?",
+        hint: "Bitte wählen Sie die passende Kategorie.",
+        grid: "cols-3",
+        options: [
+          { value:"pre1978", label:"Altbau (bis 1977)", score:0.30, heatWm2: 95 },
+          { value:"1978_2001", label:"1978–2001", score:0.20, heatWm2: 70 },
+          { value:"2002plus", label:"ab 2002", score:0.10, heatWm2: 50 }
+        ]
+      },
+      {
+        id: "insulation",
+        question: "Dämmstandard / Sanierungsgrad?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:"poor", label:"Unsaniert", score:0.30, factor: 1.15 },
+          { value:"mid", label:"Teilsaniert", score:0.18, factor: 1.00 },
+          { value:"good", label:"Gut saniert", score:0.06, factor: 0.85 }
+        ]
+      },
+      {
+        // Presets + Slider-Option
+        id: "area",
+        question: "Wie groß ist die beheizte Wohnfläche?",
+        hint: "Wählen Sie eine Größe oder nutzen Sie die individuellen Werte.",
+        grid: "cols-3",
+        options: [
+          { value:"small", label:"Klein (ca. 80 m²)", scoreNorm:0.18, area: 80 },
+          { value:"mid",   label:"Mittel (ca. 140 m²)", scoreNorm:0.52, area: 140 },
+          { value:"large", label:"Groß (ca. 220 m²)", scoreNorm:0.90, area: 220 }
+        ]
+      },
+      {
+        id: "emitters",
+        question: "Wie wird die Wärme im Haus verteilt?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:"ufh", label:"Fußbodenheizung", score:0.05, jaz: 3.8, add: 0 },
+          { value:"rads", label:"Heizkörper", score:0.20, jaz: 3.2, add: 1200 },
+          { value:"mix", label:"Gemischt", score:0.14, jaz: 3.4, add: 600 }
+        ]
+      },
+      {
+        id: "source",
+        question: "Welche Wärmepumpe ist geplant?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:"air", label:"Luft/Wasser", score:0.10, add: 0 },
+          { value:"brine", label:"Sole/Wasser", score:0.18, add: 6500 },
+          { value:"hybrid", label:"Hybrid (mit Spitzenlast)", score:0.14, add: 2200 }
+        ]
+      },
+      {
+        id: "dhw",
+        question: "Soll Warmwasser über die Wärmepumpe laufen?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-2",
+        options: [
+          { value:"yes", label:"Ja", score:0.12, add: 1200 },
+          { value:"no", label:"Nein", score:0.00, add: 0 }
+        ]
+      },
+      {
+        id: "occupants",
+        question: "Wie viele Personen leben im Haushalt?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:1, label:"1 Person", score:0.02, dhwKwh: 600 },
+          { value:2, label:"2 Personen", score:0.06, dhwKwh: 900 },
+          { value:4, label:"4 Personen", score:0.12, dhwKwh: 1300 }
+        ]
+      },
+      {
+        id: "elecPrice",
+        question: "Welchen Strompreis möchten Sie ansetzen?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:0.28, label:"0,28 €/kWh", score:0.02 },
+          { value:0.32, label:"0,32 €/kWh", score:0.06 },
+          { value:0.36, label:"0,36 €/kWh", score:0.10 }
+        ]
+      },
+      {
+        id: "timing",
+        question: "Zeitpunkt der Ausführung?",
+        hint: "Bitte wählen Sie eine Option.",
+        grid: "cols-3",
+        options: [
+          { value:"soon", label:"1–3 Monate", score:0.16, add: 1200 },
+          { value:"mid", label:"3–6 Monate", score:0.08, add: 600 },
+          { value:"later", label:"Später", score:0.00, add: 0 }
+        ]
+      },
+      {
+        id: "result",
+        question: "Preisinformation",
+        hint: "Hier sehen Sie das Ergebnis.",
+        grid: "cols-2",
+        options: []
+      }
+    ];
+
+    // Gewichtung (Summe ~ 1.00; wir clampen)
+    const weights = {
+      ownership:    0.05,
+      buildingType: 0.06,
+      projectType:  0.10,
+      year:         0.14,
+      insulation:   0.14,
+      area:         0.16,
+      emitters:     0.10,
+      source:       0.08,
+      dhw:          0.05,
+      occupants:    0.04,
+      elecPrice:    0.02,
+      timing:       0.06
+    };
+
+    // =========================
+    // State / UI
+    // =========================
+    const state = { stepIndex:0, answers:{} };
+
+    const elQuestion   = document.getElementById("question");
+    const elHint       = document.getElementById("hint");
+    const elOptions    = document.getElementById("options");
+    const elBack       = document.getElementById("backBtn");
+    const elProgress   = document.getElementById("progressFill");
+    const elStepLabel  = document.getElementById("stepLabel");
+    const elFooterMeta = document.getElementById("footerMeta");
+    const elMetaRight  = document.getElementById("metaRight");
+
+    const elResultWrap = document.getElementById("result");
+    const elTotalOut   = document.getElementById("totalOut");
+    const elCDevice    = document.getElementById("cDevice");
+    const elCInstall   = document.getElementById("cInstall");
+    const elCElec      = document.getElementById("cElec");
+    const elCSystem    = document.getElementById("cSystem");
+    const elCPlan      = document.getElementById("cPlan");
+
+    const elKwOut      = document.getElementById("kwOut");
+    const elCKw        = document.getElementById("cKw");
+    const elCKwh       = document.getElementById("cKwh");
+    const elCCost      = document.getElementById("cCost");
+
+    const elCtaLink    = document.getElementById("ctaLink");
+    elCtaLink.href = CTA_URL;
+
+    // Slider UI
+    const elAreaCustomWrap = document.getElementById("areaCustomWrap");
+    const elAreaRange  = document.getElementById("areaRange");
+    const elHeightRange= document.getElementById("heightRange");
+    const elAreaVal    = document.getElementById("areaVal");
+    const elHeightVal  = document.getElementById("heightVal");
+    const elAreaLive   = document.getElementById("areaLive");
+    const elApplyAreaBtn = document.getElementById("applyAreaBtn");
+
+    function euro(n){
+      return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"}).format(n);
+    }
+    function clamp01(x){ return Math.min(1, Math.max(0, x)); }
+    function round2(x){ return Math.round(x*100)/100; }
+
+    function setProgress(){
+      const current = state.stepIndex + 1;
+      const totalSteps = steps.length;
+      const pct = ((current - 1) / (totalSteps - 1)) * 100;
+      elProgress.style.width = pct + "%";
+      elStepLabel.textContent = `Schritt ${current} von ${totalSteps}`;
+      elMetaRight.textContent = `Schritt ${current} von ${totalSteps}`;
+      elFooterMeta.textContent = `Schritt ${current} von ${totalSteps}`;
+    }
+
+    // ===== Slider (Wohnfläche/Deckenhöhe) =====
+    function updateAreaLive(){
+      const a = parseFloat(elAreaRange.value);
+      const h = parseFloat(elHeightRange.value);
+      elAreaVal.textContent = `${Math.round(a)} m²`;
+      elHeightVal.textContent = `${h.toFixed(1).replace(".",",")} m`;
+      elAreaLive.textContent = `Wohnfläche: ${Math.round(a)} m² · Höhe: ${h.toFixed(1).replace(".",",")} m`;
+      return { area:a, height:h };
+    }
+    ["input","change"].forEach(evt=>{
+      elAreaRange.addEventListener(evt, updateAreaLive);
+      elHeightRange.addEventListener(evt, updateAreaLive);
+    });
+
+    // ===== Logik: Invest =====
+    function computeTotal(){
+      let s = 0;
+      let addons = 0;
+
+      for (const step of steps){
+        const ans = state.answers[step.id];
+        if (!ans) continue;
+
+        if (typeof ans.add === "number") addons += ans.add;
+
+        const w = weights[step.id];
+        if (!w) continue;
+
+        if (step.id === "area"){
+          const norm = (typeof ans.scoreNorm === "number") ? ans.scoreNorm : 0;
+          s += w * clamp01(norm);
+          continue;
+        }
+
+        const maxScore = (step.options && step.options.length)
+          ? Math.max(...step.options.map(o => o.score ?? 0))
+          : 0;
+
+        const norm = maxScore === 0 ? 0 : ((ans.score ?? 0) / maxScore);
+        s += w * clamp01(norm);
+      }
+
+      s = clamp01(s);
+
+      const base = PRICE_MIN + s * (PRICE_MAX - PRICE_MIN);
+      const total = base + addons;
+
+      return round2(total);
+    }
+
+    function breakdown(total){
+      const raw = {
+        device:  total * split.device,
+        install: total * split.install,
+        elec:    total * split.elec,
+        system:  total * split.system,
+        plan:    total * split.plan
+      };
+
+      // Rundung + Summenfix
+      const out = {
+        device:  round2(raw.device),
+        install: round2(raw.install),
+        elec:    round2(raw.elec),
+        system:  round2(raw.system),
+        plan:    0
+      };
+      const sum4 = out.device + out.install + out.elec + out.system;
+      out.plan = round2(total - sum4);
+      return out;
+    }
+
+    // ===== Logik: Technik =====
+    function computeTech(){
+      // Wohnfläche & Höhe
+      const areaAns = state.answers.area;
+      const area = areaAns?.dims?.area ?? areaAns?.area ?? 120;
+      const height = areaAns?.dims?.height ?? 2.4;
+
+      // Baujahr -> W/m² Baseline (überschlägig)
+      const year = state.answers.year;
+      const baseWm2 = year?.heatWm2 ?? 70;
+
+      // Dämmung -> Faktor
+      const ins = state.answers.insulation;
+      const insFactor = ins?.factor ?? 1.0;
+
+      // Höhe -> Faktor relativ zu 2.4
+      const heightFactor = Math.max(0.9, Math.min(1.25, height / 2.4));
+
+      // Heizkörper/FBH -> JAZ (vereinfachend)
+      const em = state.answers.emitters;
+      const jaz = em?.jaz ?? 3.4;
+
+      // Warmwasser -> Zusatz kWh_th
+      const dhw = state.answers.dhw?.value === "yes";
+      const occ = state.answers.occupants?.dhwKwh ?? 900; // thermisch (grob)
+      const dhw_th = dhw ? occ : 0;
+
+      // Heizleistung kW (überschlägig): Fläche * (W/m²) * Faktoren
+      const kw = (area * baseWm2 * insFactor * heightFactor) / 1000;
+
+      // Heizwärmebedarf (thermisch) grob: kW * Vollbenutzungsstunden
+      // Wir nutzen eine konservative Pauschale, weil echte Heizlast/Region fehlt.
+      const fullLoadHours = 1800; // überschlägig
+      const heat_th = kw * fullLoadHours; // kWh_th
+
+      // Strom kWh_el: (Heizen + Warmwasser) / JAZ
+      const kwh_el = (heat_th + dhw_th) / jaz;
+
+      // Strompreis
+      const p = state.answers.elecPrice?.value ?? 0.32;
+      const cost = kwh_el * p;
+
+      return {
+        kw: round2(kw),
+        jaz: jaz,
+        kwh_el: Math.round(kwh_el),
+        cost: round2(cost)
+      };
+    }
+
+    // ===== Render =====
+    function render(){
+      const step = steps[state.stepIndex];
+      setProgress();
+
+      elQuestion.textContent = step.question;
+      elHint.textContent = step.hint;
+
+      elOptions.className = `grid ${step.grid || "cols-2"}`;
+      elOptions.innerHTML = "";
+      elResultWrap.style.display = "none";
+
+      // Slider nur im area-step
+      elAreaCustomWrap.style.display = (step.id === "area") ? "block" : "none";
+      if (step.id === "area") updateAreaLive();
+
+      elBack.disabled = state.stepIndex === 0;
+
+      if (step.id === "result"){
+        const total = computeTotal();
+        const b = breakdown(total);
+        const t = computeTech();
+
+        elTotalOut.textContent = euro(total);
+
+        elCDevice.textContent  = euro(b.device);
+        elCInstall.textContent = euro(b.install);
+        elCElec.textContent    = euro(b.elec);
+        elCSystem.textContent  = euro(b.system);
+        elCPlan.textContent    = euro(b.plan);
+
+        elKwOut.textContent = `${t.kw.toFixed(1).replace(".",",")} kW`;
+        elCKw.textContent   = `${t.kw.toFixed(1).replace(".",",")} kW (überschlägig)`;
+        elCKwh.textContent  = `${t.kwh_el.toLocaleString("de-DE")} kWh`;
+        elCCost.textContent = euro(t.cost);
+
+        elResultWrap.style.display = "block";
+        return;
+      }
+
+      // Optionen
+      step.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.type="button";
+        btn.className="opt";
+        btn.setAttribute("aria-selected","false");
+
+        const text = document.createElement("div");
+        text.className="optText";
+
+        const main = document.createElement("div");
+        main.className="optMain";
+        main.textContent = opt.label;
+
+        text.appendChild(main);
+
+        const chev = document.createElement("div");
+        chev.className="chev";
+        chev.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+
+        btn.appendChild(text);
+        btn.appendChild(chev);
+
+        btn.addEventListener("click", ()=>{
+          if (step.id === "area"){
+            // Preset übernimmt Fläche + Standardhöhe
+            state.answers.area = {
+              value: opt.value,
+              label: opt.label,
+              scoreNorm: opt.scoreNorm ?? 0,
+              area: opt.area ?? 120,
+              dims: { area: opt.area ?? 120, height: 2.4 }
+            };
+            goNext();
+            return;
+          }
+
+          state.answers[step.id] = opt;
+          goNext();
+        });
+
+        elOptions.appendChild(btn);
+      });
+    }
+
+    function goNext(){
+      if (state.stepIndex < steps.length - 1){
+        state.stepIndex++;
+        render();
+      }
+    }
+    function goBack(){
+      if (state.stepIndex > 0){
+        state.stepIndex--;
+        render();
+      }
+    }
+    elBack.addEventListener("click", goBack);
+
+    // Slider: übernehmen als "custom"
+    elApplyAreaBtn.addEventListener("click", ()=>{
+      const { area, height } = updateAreaLive();
+
+      // Normierung der Fläche für Score
+      const minA = 40, maxA = 300;
+      const norm = clamp01((area - minA) / (maxA - minA));
+
+      state.answers.area = {
+        value: "custom",
+        label: `Individuell (${Math.round(area)} m²)`,
+        scoreNorm: norm,
+        area: area,
+        dims: { area: area, height: height }
+      };
+      goNext();
+    });
+
+    // Init
+    render();
+  </script>
+</body>
+</html>
