@@ -228,10 +228,7 @@
       padding:16px 18px 18px 18px;
     }
 
-    .grid{
-      display:grid;
-      gap:14px;
-    }
+    .grid{ display:grid; gap:14px; }
     .grid.cols-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid.cols-3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
@@ -270,10 +267,6 @@
       transform: translateY(-1px);
       border-color: rgba(255,255,255,.22);
       filter: brightness(1.03);
-    }
-    .opt[aria-selected="true"]{
-      border-color: rgba(179,0,60,.60);
-      box-shadow: var(--accentGlow);
     }
 
     .optText{
@@ -414,7 +407,7 @@
       color: rgba(255,255,255,.62);
     }
 
-    /* Slider Block (Wohnfläche/Deckenhöhe) */
+    /* Slider Block */
     .customBox{
       margin-top:14px;
       border-radius: 22px;
@@ -512,7 +505,7 @@
 
         <div class="subRow">
           <div class="subText">
-            Unverbindliche Kostenschätzung auf Basis Ihrer Auswahl. Keine Preisgarantie.
+            Unverbindliche Kostenschätzung auf Basis der Auswahl. Keine Preisgarantie.
           </div>
           <div class="progressWrap">
             <div class="progressBar" aria-hidden="true">
@@ -528,7 +521,7 @@
           <div class="panelHead">
             <div class="qWrap">
               <h2 class="question" id="question">…</h2>
-              <p class="hint" id="hint">Bitte wählen Sie eine Option.</p>
+              <p class="hint" id="hint">Bitte eine Option wählen.</p>
             </div>
             <div class="meta" id="metaRight"> </div>
           </div>
@@ -536,7 +529,7 @@
           <div class="panelBody">
             <div class="grid cols-2" id="options"></div>
 
-            <!-- Custom-Block: nur im Wohnflächen-Schritt sichtbar -->
+            <!-- Slider nur im Wohnflächen-Schritt -->
             <div id="areaCustomWrap" style="display:none;">
               <div class="customBox">
                 <div class="customTitleRow">
@@ -545,16 +538,16 @@
                 </div>
 
                 <p class="hint" style="margin:0; color:rgba(255,255,255,.78);">
-                  Stellen Sie Wohnfläche und Deckenhöhe ein. Daraus wird die überschlägige Heizleistung abgeleitet.
+                  Wohnfläche und Deckenhöhe einstellen. Daraus wird eine überschlägige Heizleistung abgeleitet.
                 </p>
 
                 <div class="sliders">
                   <div class="sItem">
                     <div class="sLabel">
                       <span>Wohnfläche</span>
-                      <span class="sValue" id="areaVal">120 m²</span>
+                      <span class="sValue" id="areaVal">140 m²</span>
                     </div>
-                    <input id="areaRange" type="range" min="40" max="300" step="5" value="120" />
+                    <input id="areaRange" type="range" min="40" max="300" step="5" value="140" />
                   </div>
 
                   <div class="sItem">
@@ -574,7 +567,7 @@
                 </div>
 
                 <p class="note" style="margin-top:10px">
-                  Hinweis: Überschlägige Berechnung. Für eine exakte Auslegung ist eine Heizlastberechnung erforderlich.
+                  Hinweis: Überschlägige Berechnung. Exakte Auslegung erfordert Heizlastberechnung.
                 </p>
               </div>
             </div>
@@ -587,31 +580,16 @@
                 </div>
 
                 <p class="hint" style="margin:0 0 8px 0; color:rgba(255,255,255,.78);">
-                  Unverbindliche Kostenschätzung auf Basis Ihrer Auswahl. Ergebnis dient als Orientierung und ersetzt keine Planung vor Ort.
+                  Unverbindliche Kostenschätzung auf Basis der Auswahl. Ergebnis dient als Orientierung und ersetzt keine Vor-Ort-Prüfung.
                 </p>
 
                 <table class="table" aria-label="Kostenaufteilung">
                   <tbody>
-                    <tr>
-                      <td>Wärmepumpe (Gerät + Zubehör)</td>
-                      <td id="cDevice">–</td>
-                    </tr>
-                    <tr>
-                      <td>Installation / Montage / Hydraulik</td>
-                      <td id="cInstall">–</td>
-                    </tr>
-                    <tr>
-                      <td>Elektroarbeiten (Anschluss / Absicherung)</td>
-                      <td id="cElec">–</td>
-                    </tr>
-                    <tr>
-                      <td>Umbauten am Heizsystem (z. B. Heizkörper/Anpassungen)</td>
-                      <td id="cSystem">–</td>
-                    </tr>
-                    <tr>
-                      <td>Planung / Inbetriebnahme / Einregulierung</td>
-                      <td id="cPlan">–</td>
-                    </tr>
+                    <tr><td>Wärmepumpe (Gerät + Zubehör)</td><td id="cDevice">–</td></tr>
+                    <tr><td>Installation / Hydraulik / Montage</td><td id="cInstall">–</td></tr>
+                    <tr><td>Elektroarbeiten (Anschluss / Absicherung)</td><td id="cElec">–</td></tr>
+                    <tr><td>Umbauten am Heizsystem (z. B. Anpassungen, Hydraulikabgleich)</td><td id="cSystem">–</td></tr>
+                    <tr><td>Planung / Inbetriebnahme / Einregulierung</td><td id="cPlan">–</td></tr>
                   </tbody>
                 </table>
 
@@ -622,22 +600,13 @@
 
                 <table class="table" aria-label="Technische Orientierung">
                   <tbody>
-                    <tr>
-                      <td>Überschlägige Heizleistung</td>
-                      <td id="cKw">–</td>
-                    </tr>
-                    <tr>
-                      <td>Geschätzter Stromverbrauch pro Jahr</td>
-                      <td id="cKwh">–</td>
-                    </tr>
-                    <tr>
-                      <td>Geschätzte Stromkosten pro Jahr</td>
-                      <td id="cCost">–</td>
-                    </tr>
+                    <tr><td>Überschlägige Heizleistung</td><td id="cKw">–</td></tr>
+                    <tr><td>JAZ (vereinfachter Ansatz)</td><td id="cJaz">–</td></tr>
+                    <tr><td>Geschätzter Stromverbrauch pro Jahr</td><td id="cKwh">–</td></tr>
+                    <tr><td>Geschätzte Stromkosten pro Jahr</td><td id="cCost">–</td></tr>
                   </tbody>
                 </table>
 
-                <!-- NUR EIN CTA -->
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;">
                   <a class="btn btnPrimary" id="ctaLink" href="https://elitebau-hamburg.de/kontakt" target="_blank" rel="noopener">
                     Kostenlose Vor-Ort-Einschätzung anfragen
@@ -646,7 +615,7 @@
                 </div>
 
                 <div class="note">
-                  Unverbindliche Kostenschätzung. Keine Preisgarantie. Abweichungen sind durch Zustand, Leitungen, Heizflächen, Vorlauftemperatur, Fundament/Schallschutz und Elektro möglich.
+                  Keine Preisgarantie. Abweichungen durch Zustand vor Ort (Leitungen, Heizflächen, Schallschutz, Fundament, Zählerschrank, Netzbetreiber-Vorgaben) möglich.
                 </div>
               </div>
             </div>
@@ -670,22 +639,26 @@
 
   <script>
     // =========================
-    // Konfiguration
+    // Realismus-Upgrade: Ziel
+    // - Elektro nicht pauschal zu hoch
+    // - System-Umbauten realistischer (Abgleich, Puffer, Anpassungen)
+    // - Technik: Heizleistung und Verbrauch konsistenter (Region + Bestand + Dämmung + Wärmeabgabe)
+    // - Ein-Punkt-Ausgabe bleibt, keine Preisspanne
     // =========================
+
     const CTA_URL = "https://elitebau-hamburg.de/kontakt";
 
-    // Baseline-Invest (Luft/Wasser) als Orientierung:
-    // Viele Quellen nennen grob ~27–40k inkl. Einbau (abhängig von Leistung/Umfang).
-    // Wir nutzen intern eine Min/Max-Kalibrierung für die Ein-Punkt-Ausgabe (keine Spanne im UI).
-    const PRICE_MIN = 26000;
-    const PRICE_MAX = 42000;
+    // Baseline für Luft/Wasser (typischer Rahmen, ohne Sonderfälle).
+    // Kein UI für Spannen, nur interne Kalibrierung.
+    const BASE_MIN = 24500;
+    const BASE_MAX = 39500;
 
-    // Kosten-Split (Summe = 1.00)
-    const split = {
-      device:  0.40,
-      install: 0.27,
-      elec:    0.10,
-      system:  0.13,
+    // Default-Split (wird dynamisch leicht angepasst)
+    const baseSplit = {
+      device:  0.38,
+      install: 0.28,
+      elec:    0.08,
+      system:  0.16,
       plan:    0.10
     };
 
@@ -696,49 +669,49 @@
       {
         id: "ownership",
         question: "Sind Sie Eigentümer oder Mieter?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-2",
         options: [
           { value:"owner", label:"Eigentümer", score:0.00 },
-          { value:"renter", label:"Mieter", score:0.10 }
+          { value:"renter", label:"Mieter", score:0.06, add: 350 } // Abstimmung/Mehraufwand
         ]
       },
       {
-        id: "buildingType",
-        question: "Welcher Gebäudetyp ist es?",
-        hint: "Bitte wählen Sie eine Option.",
+        id: "region",
+        question: "In welcher Region liegt das Gebäude?",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"sfh", label:"Einfamilienhaus", score:0.10 },
-          { value:"th",  label:"Reihenhaus", score:0.06 },
-          { value:"mfh", label:"Mehrfamilienhaus", score:0.18 }
+          { value:"north", label:"Nord", score:0.10, hlh: 2000, designAdj: 1.06 },
+          { value:"middle", label:"Mitte", score:0.06, hlh: 1850, designAdj: 1.00 },
+          { value:"south", label:"south", score:0.04, hlh: 1700, designAdj: 0.96 }
         ]
       },
       {
         id: "projectType",
-        question: "Geht es um Neubau oder Bestand (Heizungstausch)?",
-        hint: "Bitte wählen Sie eine Option.",
+        question: "Neubau oder Bestand (Heizungstausch)?",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-2",
         options: [
-          { value:"new", label:"Neubau", score:0.00, add: 0 },
-          { value:"retro", label:"Bestand / Tausch", score:0.18, add: 1800 }
+          { value:"new", label:"Neubau", score:0.00, add: 0, retrofit: false },
+          { value:"retro", label:"Bestand / Tausch", score:0.20, add: 1400, retrofit: true }
         ]
       },
       {
         id: "year",
-        question: "Baujahr / energetischer Zustand?",
-        hint: "Bitte wählen Sie die passende Kategorie.",
+        question: "Baujahr / energetischer Stand (vereinfacht)?",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"pre1978", label:"Altbau (bis 1977)", score:0.30, heatWm2: 95 },
-          { value:"1978_2001", label:"1978–2001", score:0.20, heatWm2: 70 },
+          { value:"pre1978", label:"bis 1977", score:0.34, heatWm2: 95 },
+          { value:"1978_2001", label:"1978–2001", score:0.22, heatWm2: 70 },
           { value:"2002plus", label:"ab 2002", score:0.10, heatWm2: 50 }
         ]
       },
       {
         id: "insulation",
         question: "Dämmstandard / Sanierungsgrad?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
           { value:"poor", label:"Unsaniert", score:0.30, factor: 1.15 },
@@ -747,10 +720,9 @@
         ]
       },
       {
-        // Presets + Slider-Option
         id: "area",
         question: "Wie groß ist die beheizte Wohnfläche?",
-        hint: "Wählen Sie eine Größe oder nutzen Sie die individuellen Werte.",
+        hint: "Größe wählen oder individuell einstellen.",
         grid: "cols-3",
         options: [
           { value:"small", label:"Klein (ca. 80 m²)", scoreNorm:0.18, area: 80 },
@@ -760,51 +732,63 @@
       },
       {
         id: "emitters",
-        question: "Wie wird die Wärme im Haus verteilt?",
-        hint: "Bitte wählen Sie eine Option.",
+        question: "Wie wird Wärme im Haus verteilt?",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"ufh", label:"Fußbodenheizung", score:0.05, jaz: 3.8, add: 0 },
-          { value:"rads", label:"Heizkörper", score:0.20, jaz: 3.2, add: 1200 },
-          { value:"mix", label:"Gemischt", score:0.14, jaz: 3.4, add: 600 }
+          { value:"ufh", label:"Fußbodenheizung", score:0.06, jazBase: 3.8, sysAdd: 0 },
+          { value:"rads", label:"Heizkörper", score:0.20, jazBase: 3.2, sysAdd: 900 }, // höhere Vorlauftemperatur, eher mehr Anpassung
+          { value:"mix", label:"Gemischt", score:0.14, jazBase: 3.4, sysAdd: 450 }
         ]
       },
       {
         id: "source",
         question: "Welche Wärmepumpe ist geplant?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"air", label:"Luft/Wasser", score:0.10, add: 0 },
-          { value:"brine", label:"Sole/Wasser", score:0.18, add: 6500 },
-          { value:"hybrid", label:"Hybrid (mit Spitzenlast)", score:0.14, add: 2200 }
+          { value:"air", label:"Luft/Wasser", score:0.10, add: 0, jazAdj: 0.00 },
+          { value:"brine", label:"Sole/Wasser", score:0.18, add: 6000, jazAdj: 0.25 }, // Tiefbau/Bohren nicht enthalten, hier pauschal als Mehrkosten
+          { value:"hybrid", label:"Hybrid (Spitzenlast)", score:0.14, add: 2200, jazAdj: -0.05 }
         ]
       },
       {
         id: "dhw",
         question: "Soll Warmwasser über die Wärmepumpe laufen?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-2",
         options: [
-          { value:"yes", label:"Ja", score:0.12, add: 1200 },
-          { value:"no", label:"Nein", score:0.00, add: 0 }
+          { value:"yes", label:"Ja", score:0.12, add: 1100, dhw: true },
+          { value:"no", label:"Nein", score:0.00, add: 0, dhw: false }
         ]
       },
       {
         id: "occupants",
         question: "Wie viele Personen leben im Haushalt?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:1, label:"1 Person", score:0.02, dhwKwh: 600 },
-          { value:2, label:"2 Personen", score:0.06, dhwKwh: 900 },
-          { value:4, label:"4 Personen", score:0.12, dhwKwh: 1300 }
+          { value:1, label:"1 Person", score:0.02, dhwThKwh: 700 },
+          { value:2, label:"2 Personen", score:0.06, dhwThKwh: 1100 },
+          { value:4, label:"4 Personen", score:0.12, dhwThKwh: 1700 }
+        ]
+      },
+      {
+        // Realismus: Elektro wird hier realistisch gesteuert
+        id: "elecComplexity",
+        question: "Elektro / Zählerschrank – welcher Zustand ist wahrscheinlich?",
+        hint: "Bitte eine Option wählen.",
+        grid: "cols-3",
+        options: [
+          { value:"standard", label:"Standard (Anschluss möglich)", score:0.04, elecAdd: 700 },
+          { value:"upgrade", label:"Upgrade nötig (Schrank/Absicherung)", score:0.18, elecAdd: 2400 },
+          { value:"unknown", label:"Unklar", score:0.10, elecAdd: 1400 }
         ]
       },
       {
         id: "elecPrice",
-        question: "Welchen Strompreis möchten Sie ansetzen?",
-        hint: "Bitte wählen Sie eine Option.",
+        question: "Welchen Strompreis soll die Rechnung ansetzen?",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
           { value:0.28, label:"0,28 €/kWh", score:0.02 },
@@ -815,37 +799,38 @@
       {
         id: "timing",
         question: "Zeitpunkt der Ausführung?",
-        hint: "Bitte wählen Sie eine Option.",
+        hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"soon", label:"1–3 Monate", score:0.16, add: 1200 },
-          { value:"mid", label:"3–6 Monate", score:0.08, add: 600 },
+          { value:"soon", label:"1–3 Monate", score:0.14, add: 900 },
+          { value:"mid", label:"3–6 Monate", score:0.08, add: 450 },
           { value:"later", label:"Später", score:0.00, add: 0 }
         ]
       },
       {
         id: "result",
         question: "Preisinformation",
-        hint: "Hier sehen Sie das Ergebnis.",
+        hint: "Hier steht das Ergebnis.",
         grid: "cols-2",
         options: []
       }
     ];
 
-    // Gewichtung (Summe ~ 1.00; wir clampen)
+    // Gewichtung (Realismus: Einfluss stärker auf Bestand/Elektro/System statt pauschal)
     const weights = {
-      ownership:    0.05,
-      buildingType: 0.06,
-      projectType:  0.10,
-      year:         0.14,
-      insulation:   0.14,
-      area:         0.16,
-      emitters:     0.10,
-      source:       0.08,
-      dhw:          0.05,
-      occupants:    0.04,
-      elecPrice:    0.02,
-      timing:       0.06
+      ownership:       0.03,
+      region:          0.05,
+      projectType:     0.12,
+      year:            0.14,
+      insulation:      0.14,
+      area:            0.18,
+      emitters:        0.10,
+      source:          0.08,
+      dhw:             0.05,
+      occupants:       0.03,
+      elecComplexity:  0.05,
+      elecPrice:       0.00, // Preis beeinflusst nur Betriebskosten, nicht Invest
+      timing:          0.03
     };
 
     // =========================
@@ -872,6 +857,7 @@
 
     const elKwOut      = document.getElementById("kwOut");
     const elCKw        = document.getElementById("cKw");
+    const elCJaz       = document.getElementById("cJaz");
     const elCKwh       = document.getElementById("cKwh");
     const elCCost      = document.getElementById("cCost");
 
@@ -903,7 +889,7 @@
       elFooterMeta.textContent = `Schritt ${current} von ${totalSteps}`;
     }
 
-    // ===== Slider (Wohnfläche/Deckenhöhe) =====
+    // Slider
     function updateAreaLive(){
       const a = parseFloat(elAreaRange.value);
       const h = parseFloat(elHeightRange.value);
@@ -917,16 +903,86 @@
       elHeightRange.addEventListener(evt, updateAreaLive);
     });
 
-    // ===== Logik: Invest =====
-    function computeTotal(){
+    // =========================
+    // Realistische Technik
+    // =========================
+    function computeTech(){
+      const region = state.answers.region;
+      const hlh = region?.hlh ?? 1850;
+      const designAdj = region?.designAdj ?? 1.00;
+
+      const areaAns = state.answers.area;
+      const area = areaAns?.dims?.area ?? areaAns?.area ?? 140;
+      const height = areaAns?.dims?.height ?? 2.4;
+
+      const year = state.answers.year;
+      const baseWm2 = year?.heatWm2 ?? 70;
+
+      const ins = state.answers.insulation;
+      const insFactor = ins?.factor ?? 1.0;
+
+      const heightFactor = Math.max(0.90, Math.min(1.25, height / 2.4));
+
+      const emit = state.answers.emitters;
+      const jazBase = emit?.jazBase ?? 3.4;
+
+      const source = state.answers.source;
+      const jazAdj = source?.jazAdj ?? 0.0;
+
+      // JAZ-Korrektur nach Gebäudestand (vereinfachend, aber realistischer als fix):
+      // schlechterer Stand -> höhere Vorlauftemp/mehr Verluste -> geringere JAZ
+      let jazBuildingAdj = 0;
+      if ((ins?.value ?? "mid") === "poor") jazBuildingAdj -= 0.20;
+      if ((ins?.value ?? "mid") === "good") jazBuildingAdj += 0.10;
+
+      // Region: kälter -> etwas weniger JAZ (Außenluft häufiger kalt)
+      let jazRegionAdj = 0;
+      if ((region?.value ?? "middle") === "north") jazRegionAdj -= 0.10;
+      if ((region?.value ?? "middle") === "south") jazRegionAdj += 0.05;
+
+      // Heizkörper drücken JAZ stärker (Vorläufe) – bereits im jazBase enthalten, aber leichter Zusatz:
+      let jazEmitterAdj = 0;
+      if ((emit?.value ?? "mix") === "rads") jazEmitterAdj -= 0.10;
+
+      let jaz = jazBase + jazAdj + jazBuildingAdj + jazRegionAdj + jazEmitterAdj;
+      jaz = Math.max(2.6, Math.min(4.4, jaz));
+
+      // Heizleistung kW (überschlägig)
+      const kw = (area * baseWm2 * insFactor * heightFactor * designAdj) / 1000;
+
+      // Wärmebedarf (thermisch) – Vollbenutzungsstunden nach Region
+      const heat_th = kw * hlh; // kWh_th
+
+      // Warmwasser thermisch
+      const dhw = state.answers.dhw?.dhw === true;
+      const occ = state.answers.occupants?.dhwThKwh ?? 1100;
+      const dhw_th = dhw ? occ : 0;
+
+      // Strom (elektrisch)
+      const kwh_el = (heat_th + dhw_th) / jaz;
+
+      const p = state.answers.elecPrice?.value ?? 0.32;
+      const cost = kwh_el * p;
+
+      return {
+        kw: round2(kw),
+        jaz: round2(jaz),
+        kwh_el: Math.round(kwh_el),
+        cost: round2(cost)
+      };
+    }
+
+    // =========================
+    // Realistische Invest-Logik
+    // - Baseline über Score (0..1) + Add-ons (Bestand, Elektro, Warmwasser, Quelle, Zeit)
+    // - Zusätzlich: Technik (kW) beeinflusst Geräte-/Montageblock leicht
+    // =========================
+    function computeScore01(){
       let s = 0;
-      let addons = 0;
 
       for (const step of steps){
         const ans = state.answers[step.id];
         if (!ans) continue;
-
-        if (typeof ans.add === "number") addons += ans.add;
 
         const w = weights[step.id];
         if (!w) continue;
@@ -945,21 +1001,90 @@
         s += w * clamp01(norm);
       }
 
-      s = clamp01(s);
-
-      const base = PRICE_MIN + s * (PRICE_MAX - PRICE_MIN);
-      const total = base + addons;
-
-      return round2(total);
+      return clamp01(s);
     }
 
-    function breakdown(total){
+    function computeTotal(){
+      const score = computeScore01();
+      const tech = computeTech();
+
+      // Baseline
+      let base = BASE_MIN + score * (BASE_MAX - BASE_MIN);
+
+      // Add-ons (klar nachvollziehbar)
+      let add = 0;
+
+      // generische add-ons
+      for (const step of steps){
+        const ans = state.answers[step.id];
+        if (!ans) continue;
+        if (typeof ans.add === "number") add += ans.add;
+      }
+
+      // Elektro aus eigener Frage
+      add += (state.answers.elecComplexity?.elecAdd ?? 0);
+
+      // System-Umbauten: abhängig von Wärmeabgabe + Bestand
+      const sysFromEmitters = (state.answers.emitters?.sysAdd ?? 0);
+      const isRetro = (state.answers.projectType?.retrofit === true);
+      add += sysFromEmitters;
+      if (isRetro) add += 650; // Abgleich/Anpassungen im Bestand häufiger
+
+      // Leistungseinfluss: größere kW -> mehr Material/Dimension/Arbeitszeit
+      // Sehr moderat, damit es nicht ausreißt.
+      const kw = tech.kw;
+      const kwRef = 8.0;
+      const kwFactor = Math.max(0.92, Math.min(1.12, 1 + ((kw - kwRef) / 40))); // +/- ~12%
+      base = base * kwFactor;
+
+      // Endsumme
+      const total = round2(base + add);
+      return { total, tech };
+    }
+
+    function dynamicSplit(total, tech){
+      // Elektro wird realistischer: orientiert am gewählten Elektro-Zustand
+      const e = state.answers.elecComplexity?.value ?? "unknown";
+      let elecShare = baseSplit.elec;
+      if (e === "standard") elecShare = 0.06;
+      if (e === "unknown")  elecShare = 0.08;
+      if (e === "upgrade")  elecShare = 0.10;
+
+      // System-Umbauten höher bei Heizkörper/Bestand
+      const emit = state.answers.emitters?.value ?? "mix";
+      const retro = state.answers.projectType?.retrofit === true;
+
+      let systemShare = baseSplit.system;
+      if (emit === "rads") systemShare += 0.03;
+      if (retro) systemShare += 0.02;
+
+      // Gerät/Montage leicht mit kW
+      let deviceShare = baseSplit.device + Math.max(-0.01, Math.min(0.02, (tech.kw - 8) / 200));
+      let installShare = baseSplit.install + Math.max(-0.01, Math.min(0.02, (tech.kw - 8) / 220));
+
+      // Plan bleibt stabil
+      let planShare = baseSplit.plan;
+
+      // Normieren auf 1.0
+      let sum = deviceShare + installShare + elecShare + systemShare + planShare;
+      deviceShare /= sum;
+      installShare /= sum;
+      elecShare   /= sum;
+      systemShare /= sum;
+      planShare   /= sum;
+
+      return { deviceShare, installShare, elecShare, systemShare, planShare };
+    }
+
+    function breakdown(total, tech){
+      const sp = dynamicSplit(total, tech);
+
       const raw = {
-        device:  total * split.device,
-        install: total * split.install,
-        elec:    total * split.elec,
-        system:  total * split.system,
-        plan:    total * split.plan
+        device:  total * sp.deviceShare,
+        install: total * sp.installShare,
+        elec:    total * sp.elecShare,
+        system:  total * sp.systemShare,
+        plan:    total * sp.planShare
       };
 
       // Rundung + Summenfix
@@ -975,57 +1100,9 @@
       return out;
     }
 
-    // ===== Logik: Technik =====
-    function computeTech(){
-      // Wohnfläche & Höhe
-      const areaAns = state.answers.area;
-      const area = areaAns?.dims?.area ?? areaAns?.area ?? 120;
-      const height = areaAns?.dims?.height ?? 2.4;
-
-      // Baujahr -> W/m² Baseline (überschlägig)
-      const year = state.answers.year;
-      const baseWm2 = year?.heatWm2 ?? 70;
-
-      // Dämmung -> Faktor
-      const ins = state.answers.insulation;
-      const insFactor = ins?.factor ?? 1.0;
-
-      // Höhe -> Faktor relativ zu 2.4
-      const heightFactor = Math.max(0.9, Math.min(1.25, height / 2.4));
-
-      // Heizkörper/FBH -> JAZ (vereinfachend)
-      const em = state.answers.emitters;
-      const jaz = em?.jaz ?? 3.4;
-
-      // Warmwasser -> Zusatz kWh_th
-      const dhw = state.answers.dhw?.value === "yes";
-      const occ = state.answers.occupants?.dhwKwh ?? 900; // thermisch (grob)
-      const dhw_th = dhw ? occ : 0;
-
-      // Heizleistung kW (überschlägig): Fläche * (W/m²) * Faktoren
-      const kw = (area * baseWm2 * insFactor * heightFactor) / 1000;
-
-      // Heizwärmebedarf (thermisch) grob: kW * Vollbenutzungsstunden
-      // Wir nutzen eine konservative Pauschale, weil echte Heizlast/Region fehlt.
-      const fullLoadHours = 1800; // überschlägig
-      const heat_th = kw * fullLoadHours; // kWh_th
-
-      // Strom kWh_el: (Heizen + Warmwasser) / JAZ
-      const kwh_el = (heat_th + dhw_th) / jaz;
-
-      // Strompreis
-      const p = state.answers.elecPrice?.value ?? 0.32;
-      const cost = kwh_el * p;
-
-      return {
-        kw: round2(kw),
-        jaz: jaz,
-        kwh_el: Math.round(kwh_el),
-        cost: round2(cost)
-      };
-    }
-
-    // ===== Render =====
+    // =========================
+    // Render
+    // =========================
     function render(){
       const step = steps[state.stepIndex];
       setProgress();
@@ -1037,29 +1114,28 @@
       elOptions.innerHTML = "";
       elResultWrap.style.display = "none";
 
-      // Slider nur im area-step
+      // Slider nur in area
       elAreaCustomWrap.style.display = (step.id === "area") ? "block" : "none";
       if (step.id === "area") updateAreaLive();
 
       elBack.disabled = state.stepIndex === 0;
 
       if (step.id === "result"){
-        const total = computeTotal();
-        const b = breakdown(total);
-        const t = computeTech();
+        const { total, tech } = computeTotal();
+        const b = breakdown(total, tech);
 
         elTotalOut.textContent = euro(total);
-
         elCDevice.textContent  = euro(b.device);
         elCInstall.textContent = euro(b.install);
         elCElec.textContent    = euro(b.elec);
         elCSystem.textContent  = euro(b.system);
         elCPlan.textContent    = euro(b.plan);
 
-        elKwOut.textContent = `${t.kw.toFixed(1).replace(".",",")} kW`;
-        elCKw.textContent   = `${t.kw.toFixed(1).replace(".",",")} kW (überschlägig)`;
-        elCKwh.textContent  = `${t.kwh_el.toLocaleString("de-DE")} kWh`;
-        elCCost.textContent = euro(t.cost);
+        elKwOut.textContent = `${tech.kw.toFixed(1).replace(".",",")} kW`;
+        elCKw.textContent   = `${tech.kw.toFixed(1).replace(".",",")} kW (überschlägig)`;
+        elCJaz.textContent  = `${tech.jaz.toFixed(2).replace(".",",")}`;
+        elCKwh.textContent  = `${tech.kwh_el.toLocaleString("de-DE")} kWh`;
+        elCCost.textContent = euro(tech.cost);
 
         elResultWrap.style.display = "block";
         return;
@@ -1070,7 +1146,6 @@
         const btn = document.createElement("button");
         btn.type="button";
         btn.className="opt";
-        btn.setAttribute("aria-selected","false");
 
         const text = document.createElement("div");
         text.className="optText";
@@ -1094,13 +1169,12 @@
 
         btn.addEventListener("click", ()=>{
           if (step.id === "area"){
-            // Preset übernimmt Fläche + Standardhöhe
             state.answers.area = {
               value: opt.value,
               label: opt.label,
               scoreNorm: opt.scoreNorm ?? 0,
-              area: opt.area ?? 120,
-              dims: { area: opt.area ?? 120, height: 2.4 }
+              area: opt.area ?? 140,
+              dims: { area: opt.area ?? 140, height: 2.4 }
             };
             goNext();
             return;
@@ -1128,11 +1202,9 @@
     }
     elBack.addEventListener("click", goBack);
 
-    // Slider: übernehmen als "custom"
+    // Slider übernehmen
     elApplyAreaBtn.addEventListener("click", ()=>{
       const { area, height } = updateAreaLive();
-
-      // Normierung der Fläche für Score
       const minA = 40, maxA = 300;
       const norm = clamp01((area - minA) / (maxA - minA));
 
