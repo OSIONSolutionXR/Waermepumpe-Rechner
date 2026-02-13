@@ -262,6 +262,7 @@
       gap:14px;
       outline:none;
       user-select:none;
+      overflow:hidden;
     }
     .opt:hover{
       transform: translateY(-1px);
@@ -269,19 +270,31 @@
       filter: brightness(1.03);
     }
 
+    /* WICHTIG: Labels umbrechen lassen + sauberer Innenabstand */
     .optText{
       display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:6px;
       min-width:0;
+      flex:1 1 auto;
     }
     .optMain{
       font-size:18px;
-      font-weight:850;
+      font-weight:900;
       color: rgba(255,255,255,.96);
-      line-height:1.1;
-      white-space:nowrap;
+      line-height:1.15;
+      white-space:normal;          /* vorher nowrap -> jetzt lesbar */
+      overflow-wrap:anywhere;       /* bricht lange Wörter sauber */
+      max-width:100%;
+    }
+    .optSub{
+      font-size:12.5px;
+      font-weight:800;
+      color: rgba(255,255,255,.78);
+      line-height:1.15;
+      white-space:normal;
+      overflow-wrap:anywhere;
     }
 
     .chev{
@@ -529,7 +542,6 @@
           <div class="panelBody">
             <div class="grid cols-2" id="options"></div>
 
-            <!-- Slider nur im Wohnflächen-Schritt -->
             <div id="areaCustomWrap" style="display:none;">
               <div class="customBox">
                 <div class="customTitleRow">
@@ -638,33 +650,12 @@
   </div>
 
   <script>
-    // =========================
-    // Realismus-Upgrade: Ziel
-    // - Elektro nicht pauschal zu hoch
-    // - System-Umbauten realistischer (Abgleich, Puffer, Anpassungen)
-    // - Technik: Heizleistung und Verbrauch konsistenter (Region + Bestand + Dämmung + Wärmeabgabe)
-    // - Ein-Punkt-Ausgabe bleibt, keine Preisspanne
-    // =========================
-
     const CTA_URL = "https://elitebau-hamburg.de/kontakt";
-
-    // Baseline für Luft/Wasser (typischer Rahmen, ohne Sonderfälle).
-    // Kein UI für Spannen, nur interne Kalibrierung.
     const BASE_MIN = 24500;
     const BASE_MAX = 39500;
 
-    // Default-Split (wird dynamisch leicht angepasst)
-    const baseSplit = {
-      device:  0.38,
-      install: 0.28,
-      elec:    0.08,
-      system:  0.16,
-      plan:    0.10
-    };
+    const baseSplit = { device:0.38, install:0.28, elec:0.08, system:0.16, plan:0.10 };
 
-    // =========================
-    // Steps
-    // =========================
     const steps = [
       {
         id: "ownership",
@@ -673,7 +664,7 @@
         grid: "cols-2",
         options: [
           { value:"owner", label:"Eigentümer", score:0.00 },
-          { value:"renter", label:"Mieter", score:0.06, add: 350 } // Abstimmung/Mehraufwand
+          { value:"renter", label:"Mieter", score:0.06, add: 350 }
         ]
       },
       {
@@ -682,9 +673,9 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"north", label:"Nord", score:0.10, hlh: 2000, designAdj: 1.06 },
-          { value:"middle", label:"Mitte", score:0.06, hlh: 1850, designAdj: 1.00 },
-          { value:"south", label:"south", score:0.04, hlh: 1700, designAdj: 0.96 }
+          { value:"north",  label:"Norddeutschland", score:0.10, hlh: 2000, designAdj: 1.06 },
+          { value:"middle", label:"Mitteldeutschland", score:0.06, hlh: 1850, designAdj: 1.00 },
+          { value:"south",  label:"Süddeutschland", score:0.04, hlh: 1700, designAdj: 0.96 }
         ]
       },
       {
@@ -737,7 +728,7 @@
         grid: "cols-3",
         options: [
           { value:"ufh", label:"Fußbodenheizung", score:0.06, jazBase: 3.8, sysAdd: 0 },
-          { value:"rads", label:"Heizkörper", score:0.20, jazBase: 3.2, sysAdd: 900 }, // höhere Vorlauftemperatur, eher mehr Anpassung
+          { value:"rads", label:"Heizkörper", score:0.20, jazBase: 3.2, sysAdd: 900 },
           { value:"mix", label:"Gemischt", score:0.14, jazBase: 3.4, sysAdd: 450 }
         ]
       },
@@ -748,7 +739,7 @@
         grid: "cols-3",
         options: [
           { value:"air", label:"Luft/Wasser", score:0.10, add: 0, jazAdj: 0.00 },
-          { value:"brine", label:"Sole/Wasser", score:0.18, add: 6000, jazAdj: 0.25 }, // Tiefbau/Bohren nicht enthalten, hier pauschal als Mehrkosten
+          { value:"brine", label:"Sole/Wasser", score:0.18, add: 6000, jazAdj: 0.25 },
           { value:"hybrid", label:"Hybrid (Spitzenlast)", score:0.14, add: 2200, jazAdj: -0.05 }
         ]
       },
@@ -774,15 +765,14 @@
         ]
       },
       {
-        // Realismus: Elektro wird hier realistisch gesteuert
         id: "elecComplexity",
         question: "Elektro / Zählerschrank – welcher Zustand ist wahrscheinlich?",
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"standard", label:"Standard (Anschluss möglich)", score:0.04, elecAdd: 700 },
-          { value:"upgrade", label:"Upgrade nötig (Schrank/Absicherung)", score:0.18, elecAdd: 2400 },
-          { value:"unknown", label:"Unklar", score:0.10, elecAdd: 1400 }
+          { value:"standard", label:"Standard – Anschluss möglich", score:0.04, elecAdd: 700 },
+          { value:"upgrade",  label:"Upgrade nötig – Schrank/Absicherung", score:0.18, elecAdd: 2400 },
+          { value:"unknown",  label:"Unklar", score:0.10, elecAdd: 1400 }
         ]
       },
       {
@@ -803,20 +793,13 @@
         grid: "cols-3",
         options: [
           { value:"soon", label:"1–3 Monate", score:0.14, add: 900 },
-          { value:"mid", label:"3–6 Monate", score:0.08, add: 450 },
+          { value:"mid",  label:"3–6 Monate", score:0.08, add: 450 },
           { value:"later", label:"Später", score:0.00, add: 0 }
         ]
       },
-      {
-        id: "result",
-        question: "Preisinformation",
-        hint: "Hier steht das Ergebnis.",
-        grid: "cols-2",
-        options: []
-      }
+      { id:"result", question:"Preisinformation", hint:"Hier steht das Ergebnis.", grid:"cols-2", options:[] }
     ];
 
-    // Gewichtung (Realismus: Einfluss stärker auf Bestand/Elektro/System statt pauschal)
     const weights = {
       ownership:       0.03,
       region:          0.05,
@@ -829,13 +812,10 @@
       dhw:             0.05,
       occupants:       0.03,
       elecComplexity:  0.05,
-      elecPrice:       0.00, // Preis beeinflusst nur Betriebskosten, nicht Invest
+      elecPrice:       0.00,
       timing:          0.03
     };
 
-    // =========================
-    // State / UI
-    // =========================
     const state = { stepIndex:0, answers:{} };
 
     const elQuestion   = document.getElementById("question");
@@ -864,7 +844,6 @@
     const elCtaLink    = document.getElementById("ctaLink");
     elCtaLink.href = CTA_URL;
 
-    // Slider UI
     const elAreaCustomWrap = document.getElementById("areaCustomWrap");
     const elAreaRange  = document.getElementById("areaRange");
     const elHeightRange= document.getElementById("heightRange");
@@ -873,9 +852,7 @@
     const elAreaLive   = document.getElementById("areaLive");
     const elApplyAreaBtn = document.getElementById("applyAreaBtn");
 
-    function euro(n){
-      return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"}).format(n);
-    }
+    function euro(n){ return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"}).format(n); }
     function clamp01(x){ return Math.min(1, Math.max(0, x)); }
     function round2(x){ return Math.round(x*100)/100; }
 
@@ -889,7 +866,6 @@
       elFooterMeta.textContent = `Schritt ${current} von ${totalSteps}`;
     }
 
-    // Slider
     function updateAreaLive(){
       const a = parseFloat(elAreaRange.value);
       const h = parseFloat(elHeightRange.value);
@@ -903,9 +879,6 @@
       elHeightRange.addEventListener(evt, updateAreaLive);
     });
 
-    // =========================
-    // Realistische Technik
-    // =========================
     function computeTech(){
       const region = state.answers.region;
       const hlh = region?.hlh ?? 1850;
@@ -929,36 +902,28 @@
       const source = state.answers.source;
       const jazAdj = source?.jazAdj ?? 0.0;
 
-      // JAZ-Korrektur nach Gebäudestand (vereinfachend, aber realistischer als fix):
-      // schlechterer Stand -> höhere Vorlauftemp/mehr Verluste -> geringere JAZ
       let jazBuildingAdj = 0;
       if ((ins?.value ?? "mid") === "poor") jazBuildingAdj -= 0.20;
       if ((ins?.value ?? "mid") === "good") jazBuildingAdj += 0.10;
 
-      // Region: kälter -> etwas weniger JAZ (Außenluft häufiger kalt)
       let jazRegionAdj = 0;
       if ((region?.value ?? "middle") === "north") jazRegionAdj -= 0.10;
       if ((region?.value ?? "middle") === "south") jazRegionAdj += 0.05;
 
-      // Heizkörper drücken JAZ stärker (Vorläufe) – bereits im jazBase enthalten, aber leichter Zusatz:
       let jazEmitterAdj = 0;
       if ((emit?.value ?? "mix") === "rads") jazEmitterAdj -= 0.10;
 
       let jaz = jazBase + jazAdj + jazBuildingAdj + jazRegionAdj + jazEmitterAdj;
       jaz = Math.max(2.6, Math.min(4.4, jaz));
 
-      // Heizleistung kW (überschlägig)
       const kw = (area * baseWm2 * insFactor * heightFactor * designAdj) / 1000;
 
-      // Wärmebedarf (thermisch) – Vollbenutzungsstunden nach Region
-      const heat_th = kw * hlh; // kWh_th
+      const heat_th = kw * hlh;
 
-      // Warmwasser thermisch
       const dhw = state.answers.dhw?.dhw === true;
       const occ = state.answers.occupants?.dhwThKwh ?? 1100;
       const dhw_th = dhw ? occ : 0;
 
-      // Strom (elektrisch)
       const kwh_el = (heat_th + dhw_th) / jaz;
 
       const p = state.answers.elecPrice?.value ?? 0.32;
@@ -972,11 +937,6 @@
       };
     }
 
-    // =========================
-    // Realistische Invest-Logik
-    // - Baseline über Score (0..1) + Add-ons (Bestand, Elektro, Warmwasser, Quelle, Zeit)
-    // - Zusätzlich: Technik (kW) beeinflusst Geräte-/Montageblock leicht
-    // =========================
     function computeScore01(){
       let s = 0;
 
@@ -1008,49 +968,38 @@
       const score = computeScore01();
       const tech = computeTech();
 
-      // Baseline
       let base = BASE_MIN + score * (BASE_MAX - BASE_MIN);
 
-      // Add-ons (klar nachvollziehbar)
       let add = 0;
-
-      // generische add-ons
       for (const step of steps){
         const ans = state.answers[step.id];
         if (!ans) continue;
         if (typeof ans.add === "number") add += ans.add;
       }
 
-      // Elektro aus eigener Frage
       add += (state.answers.elecComplexity?.elecAdd ?? 0);
 
-      // System-Umbauten: abhängig von Wärmeabgabe + Bestand
       const sysFromEmitters = (state.answers.emitters?.sysAdd ?? 0);
       const isRetro = (state.answers.projectType?.retrofit === true);
       add += sysFromEmitters;
-      if (isRetro) add += 650; // Abgleich/Anpassungen im Bestand häufiger
+      if (isRetro) add += 650;
 
-      // Leistungseinfluss: größere kW -> mehr Material/Dimension/Arbeitszeit
-      // Sehr moderat, damit es nicht ausreißt.
       const kw = tech.kw;
       const kwRef = 8.0;
-      const kwFactor = Math.max(0.92, Math.min(1.12, 1 + ((kw - kwRef) / 40))); // +/- ~12%
+      const kwFactor = Math.max(0.92, Math.min(1.12, 1 + ((kw - kwRef) / 40)));
       base = base * kwFactor;
 
-      // Endsumme
       const total = round2(base + add);
       return { total, tech };
     }
 
     function dynamicSplit(total, tech){
-      // Elektro wird realistischer: orientiert am gewählten Elektro-Zustand
       const e = state.answers.elecComplexity?.value ?? "unknown";
       let elecShare = baseSplit.elec;
       if (e === "standard") elecShare = 0.06;
       if (e === "unknown")  elecShare = 0.08;
       if (e === "upgrade")  elecShare = 0.10;
 
-      // System-Umbauten höher bei Heizkörper/Bestand
       const emit = state.answers.emitters?.value ?? "mix";
       const retro = state.answers.projectType?.retrofit === true;
 
@@ -1058,14 +1007,10 @@
       if (emit === "rads") systemShare += 0.03;
       if (retro) systemShare += 0.02;
 
-      // Gerät/Montage leicht mit kW
       let deviceShare = baseSplit.device + Math.max(-0.01, Math.min(0.02, (tech.kw - 8) / 200));
       let installShare = baseSplit.install + Math.max(-0.01, Math.min(0.02, (tech.kw - 8) / 220));
-
-      // Plan bleibt stabil
       let planShare = baseSplit.plan;
 
-      // Normieren auf 1.0
       let sum = deviceShare + installShare + elecShare + systemShare + planShare;
       deviceShare /= sum;
       installShare /= sum;
@@ -1087,7 +1032,6 @@
         plan:    total * sp.planShare
       };
 
-      // Rundung + Summenfix
       const out = {
         device:  round2(raw.device),
         install: round2(raw.install),
@@ -1100,9 +1044,6 @@
       return out;
     }
 
-    // =========================
-    // Render
-    // =========================
     function render(){
       const step = steps[state.stepIndex];
       setProgress();
@@ -1114,7 +1055,6 @@
       elOptions.innerHTML = "";
       elResultWrap.style.display = "none";
 
-      // Slider nur in area
       elAreaCustomWrap.style.display = (step.id === "area") ? "block" : "none";
       if (step.id === "area") updateAreaLive();
 
@@ -1141,7 +1081,6 @@
         return;
       }
 
-      // Optionen
       step.options.forEach(opt=>{
         const btn = document.createElement("button");
         btn.type="button";
@@ -1155,6 +1094,9 @@
         main.textContent = opt.label;
 
         text.appendChild(main);
+
+        // Optional: kleinere Unterzeile, falls du später mal etwas ergänzen willst
+        // (wir nutzen das aktuell nicht – aber Layout ist dafür vorbereitet)
 
         const chev = document.createElement("div");
         chev.className="chev";
@@ -1202,7 +1144,6 @@
     }
     elBack.addEventListener("click", goBack);
 
-    // Slider übernehmen
     elApplyAreaBtn.addEventListener("click", ()=>{
       const { area, height } = updateAreaLive();
       const minA = 40, maxA = 300;
@@ -1218,7 +1159,6 @@
       goNext();
     });
 
-    // Init
     render();
   </script>
 </body>
