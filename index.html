@@ -44,6 +44,8 @@
       align-items:center;
       justify-content:center;
       padding:46px 18px;
+      /* Handy: unten genug Luft + Safe-Area */
+      padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px));
     }
 
     .shell{
@@ -186,6 +188,8 @@
         radial-gradient(900px 340px at 10% 30%, rgba(107,44,255,.10), transparent 55%),
         radial-gradient(900px 340px at 90% 40%, rgba(179,0,60,.10), transparent 55%),
         linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.60));
+      /* Ergebnisbereich: unten genug Luft + Safe-Area */
+      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     }
 
     .panel{
@@ -226,6 +230,7 @@
 
     .panelBody{
       padding:16px 18px 18px 18px;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     }
 
     .grid{ display:grid; gap:14px; }
@@ -394,6 +399,8 @@
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       padding:16px 16px;
+      /* Handy: Ergebnis nicht an den Rand pressen */
+      margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     }
     .resultHead{
       display:flex;
@@ -446,6 +453,7 @@
       padding: 12px 10px 18px;
       font-size:12px;
       color: rgba(255,255,255,.62);
+      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     }
 
     /* Slider Block */
@@ -684,7 +692,7 @@
 
     const baseSplit = { device:0.38, install:0.28, elec:0.08, system:0.16, plan:0.10 };
 
-    // --- STEPS (Neubau vs Bestand sauber getrennt + 7 Realismus-Steps + Mobile Fix via CSS) ---
+    // --- STEPS (Neubau vs Bestand sauber getrennt + Redundanz entfernt + Mobile Fix via CSS) ---
     const steps = [
       {
         id: "region",
@@ -703,8 +711,8 @@
         hint: "Neubau = Gebäude wird neu gebaut. Bestand/Tausch = Wärmepumpe ersetzt eine bestehende Heizung im bestehenden Haus.",
         grid: "cols-2",
         options: [
-          { value:"new",   label:"Neubau (Haus wird neu gebaut)",        score:0.00, add: 0,    retrofit: false },
-          { value:"retro", label:"Bestand / Tausch (Heizung wird ersetzt)",score:0.20, add: 1400, retrofit: true }
+          { value:"new",   label:"Neubau (Haus wird neu gebaut)",           score:0.00, add: 0,    retrofit: false },
+          { value:"retro", label:"Bestand / Tausch (Heizung wird ersetzt)", score:0.20, add: 1400, retrofit: true }
         ]
       },
 
@@ -797,8 +805,11 @@
           { value:"large", label:"Groß (ca. 220 m²)",   scoreNorm:0.90, area: 220 }
         ]
       },
+
+      // Bestand: Wärmeverteilung (bleibt)
       {
         id: "emitters",
+        when: (s)=> s.answers.projectType?.value === "retro",
         question: "Wie wird Wärme im Haus verteilt?",
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
@@ -822,7 +833,7 @@
         ]
       },
 
-      // Realismus: Heizflächen/Hydraulik (Neubau: geplant)
+      // Neubau: Heizflächen-Konzept (ersetzt Redundanz, dafür kein emitters im Neubau)
       {
         id: "surfacesNew",
         when: (s)=> s.answers.projectType?.value === "new",
@@ -830,23 +841,24 @@
         hint: "Einfluss auf Effizienz (Vorlauftemperatur) und Zusatzarbeiten.",
         grid: "cols-3",
         options: [
-          { value:"ufh_plan",   label:"Fußbodenheizung geplant (sehr gut)", score:0.02, sysAdd: 0,   jazAdj: 0.06 },
-          { value:"nt_rads",    label:"Große Niedertemperatur-Heizkörper (gut)", score:0.06, sysAdd: 250, jazAdj: 0.00 },
-          { value:"unk_plan",   label:"Unklar / noch nicht geplant", score:0.10, sysAdd: 900, jazAdj: -0.08 }
+          { value:"ufh_plan", label:"Fußbodenheizung geplant (sehr gut)", score:0.02, sysAdd: 0,   jazAdj: 0.06, jazBase: 3.8 },
+          { value:"nt_rads",  label:"Große Niedertemperatur-Heizkörper (gut)", score:0.06, sysAdd: 250, jazAdj: 0.00, jazBase: 3.2 },
+          { value:"mix_plan", label:"Gemischt geplant (FBH + Heizkörper)", score:0.08, sysAdd: 450, jazAdj: -0.02, jazBase: 3.4 },
+          { value:"unk_plan", label:"Unklar / noch nicht geplant", score:0.10, sysAdd: 900, jazAdj: -0.08, jazBase: 3.4 }
         ]
       },
 
-      // Realismus: Heizflächen/Hydraulik (Bestand: Zustand)
+      // Bestand: Anpassungsbedarf statt Dopplung (keine zweite „Fußbodenheizung“-Frage)
       {
         id: "surfacesRetro",
         when: (s)=> s.answers.projectType?.value === "retro",
-        question: "Wie gut passt die Heizflächen-Situation für Wärmepumpe?",
+        question: "Wie hoch ist der Anpassungsbedarf der Heizflächen für Wärmepumpe?",
         hint: "Einfluss auf Umbauten und Effizienz.",
         grid: "cols-3",
         options: [
-          { value:"good",   label:"Passt gut (Flächen/modern)",      score:0.04, sysAdd: 0,    jazAdj: 0.05 },
-          { value:"part",   label:"Teilweise (einige Anpassungen)",  score:0.10, sysAdd: 900,  jazAdj: -0.05 },
-          { value:"likely", label:"Eher alt (Umbau wahrscheinlich)", score:0.16, sysAdd: 2200, jazAdj: -0.12 }
+          { value:"low",  label:"Gering (passt gut)",             score:0.04, sysAdd: 0,    jazAdj: 0.05 },
+          { value:"mid",  label:"Mittel (einige Anpassungen)",    score:0.10, sysAdd: 900,  jazAdj: -0.05 },
+          { value:"high", label:"Hoch (Umbau wahrscheinlich)",    score:0.16, sysAdd: 2200, jazAdj: -0.12 }
         ]
       },
 
@@ -899,18 +911,17 @@
           { value:"no",  label:"Nein", score:0.00, add: 0,    dhw: false }
         ]
       },
-
-      /* ✅ ÜBERARBEITET: Personen-Ranges + immer sichtbar (kein when) */
       {
         id: "occupants",
-        question: "Wie viele Personen nutzen Warmwasser regelmäßig?",
-        hint: "Einfluss auf Warmwasser-Anteil (Duschen/Bad/Verbrauch).",
-        grid: "cols-2",
+        when: (s)=> s.answers.dhw?.dhw === true,
+        question: "Wie viele Personen leben im Haushalt?",
+        hint: "Einfluss auf Warmwasser-Anteil.",
+        grid: "cols-3",
         options: [
-          { value:"1-2", label:"1–2 Personen", score:0.03, dhwThKwh: 1200 },
-          { value:"3-4", label:"3–4 Personen", score:0.06, dhwThKwh: 1900 },
-          { value:"5-6", label:"5–6 Personen", score:0.09, dhwThKwh: 2700 },
-          { value:"7-8", label:"7–8 Personen", score:0.12, dhwThKwh: 3500 }
+          { value:"1-2", label:"1–2 Personen", score:0.04, dhwThKwh: 1100 },
+          { value:"3-4", label:"3–4 Personen", score:0.08, dhwThKwh: 1700 },
+          { value:"5-6", label:"5–6 Personen", score:0.12, dhwThKwh: 2400 },
+          { value:"7-8", label:"7–8 Personen", score:0.16, dhwThKwh: 3100 }
         ]
       },
 
@@ -922,9 +933,9 @@
         hint: "Einfluss auf Anschluss/Absicherung und mögliche Zusatzarbeiten.",
         grid: "cols-3",
         options: [
-          { value:"planned", label:"Neu geplant (passend ausgelegt)",          score:0.02, elecAdd: 0 },
-          { value:"more",    label:"Mehrleistung nötig (prüfen lassen)",       score:0.10, elecAdd: 1400 },
-          { value:"unk",     label:"Unklar",                                   score:0.08, elecAdd: 900 }
+          { value:"planned", label:"Neu geplant (passend ausgelegt)",    score:0.02, elecAdd: 0 },
+          { value:"more",    label:"Mehrleistung nötig (prüfen lassen)", score:0.10, elecAdd: 1400 },
+          { value:"unk",     label:"Unklar",                             score:0.08, elecAdd: 900 }
         ]
       },
 
@@ -977,15 +988,15 @@
       consumption:   0.04,
       buildingShape: 0.05,
       area:          0.18,
-      emitters:      0.08,
+      emitters:      0.08,   // nur Bestand
       flowTemp:      0.10,
-      surfacesNew:   0.06,
+      surfacesNew:   0.08,   // Neubau ersetzt emitters
       surfacesRetro: 0.10,
       source:        0.06,
       airSetup:      0.04,
       backup:        0.04,
       dhw:           0.04,
-      occupants:     0.02,
+      occupants:     0.03,
       elecNew:       0.04,
       elecRetro:     0.05,
       elecPrice:     0.00,
@@ -1071,6 +1082,11 @@
     function getElecAnswer(){
       return state.answers.elecNew || state.answers.elecRetro || null;
     }
+    function getEmitterAnswer(){
+      // Neubau: Heizflächen-Konzept liefert jazBase (statt emitters)
+      if (state.answers.projectType?.value === "new") return state.answers.surfacesNew || null;
+      return state.answers.emitters || null;
+    }
 
     function computeTech(){
       const region = state.answers.region;
@@ -1101,7 +1117,7 @@
       const shapeFactor = state.answers.buildingShape?.shapeFactor ?? 1.0;
       const heightFactor = Math.max(0.90, Math.min(1.25, height / 2.4));
 
-      const emit = state.answers.emitters;
+      const emit = getEmitterAnswer();
       const jazBase = emit?.jazBase ?? 3.4;
 
       const source = state.answers.source;
@@ -1129,7 +1145,7 @@
       if ((region?.value ?? "middle") === "south") jazRegionAdj += 0.05;
 
       let jazEmitterAdj = 0;
-      if ((emit?.value ?? "mix") === "rads") jazEmitterAdj -= 0.10;
+      if (mode === "retro" && (emit?.value ?? "mix") === "rads") jazEmitterAdj -= 0.10;
 
       const backup = state.answers.backup;
       const backupJazAdj = backup?.jazAdj ?? 0.0;
@@ -1157,7 +1173,7 @@
       heat_th = heat_th * ventHeatFactor;
 
       const dhw = state.answers.dhw?.dhw === true;
-      const occ = state.answers.occupants?.dhwThKwh ?? 1200;
+      const occ = state.answers.occupants?.dhwThKwh ?? 1700;
       const dhw_th = dhw ? occ : 0;
 
       const kwh_el = (heat_th + dhw_th) / jaz;
@@ -1223,9 +1239,9 @@
       add += (elecAns?.elecAdd ?? 0);
 
       // System-Add-ons
-      add += (state.answers.emitters?.sysAdd ?? 0);
+      add += (state.answers.emitters?.sysAdd ?? 0);     // nur Bestand
       add += (state.answers.flowTemp?.sysAdd ?? 0);
-      add += (getSurfacesAnswer()?.sysAdd ?? 0);
+      add += (getSurfacesAnswer()?.sysAdd ?? 0);        // Neubau + Bestand (Konzept / Anpassungsbedarf)
 
       // Bestand-Pauschale
       const isRetro = (state.answers.projectType?.retrofit === true);
@@ -1263,8 +1279,8 @@
       const flow = state.answers.flowTemp?.value ?? "mid";
       if (flow === "high") systemShare += 0.02;
 
-      const surf = getSurfacesAnswer()?.value ?? "part";
-      if (surf === "likely" || surf === "unk_plan") systemShare += 0.02;
+      const surf = getSurfacesAnswer()?.value ?? "";
+      if (surf === "high" || surf === "unk_plan") systemShare += 0.02;
 
       let installShare = baseSplit.install;
       const airSetup = state.answers.airSetup?.value ?? "normal";
@@ -1379,6 +1395,7 @@
               delete state.answers.year;
               delete state.answers.insulation;
               delete state.answers.consumption;
+              delete state.answers.emitters;
               delete state.answers.surfacesRetro;
               delete state.answers.elecRetro;
             } else {
@@ -1399,9 +1416,10 @@
             return;
           }
 
-          // Warmwasser: occupants bleibt als Auswahl, wirkt aber nur wenn dhw=true (computeTech)
+          // Warmwasser: occupants nur wenn Ja
           if (step.id === "dhw"){
             state.answers.dhw = opt;
+            if (opt.dhw !== true) delete state.answers.occupants;
             goNext();
             return;
           }
