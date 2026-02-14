@@ -235,12 +235,49 @@
     @media (max-width: 980px){
       .grid.cols-3{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+
+    /* MOBILE: nur Header-Fix (Desktop bleibt unverändert) */
     @media (max-width: 680px){
       .grid.cols-2, .grid.cols-3{ grid-template-columns: 1fr; }
-      .title{ font-size:22px; }
-      .hero{ min-height: 170px; }
+
+      .hero{ min-height: 170px; padding:18px 18px 14px 18px; }
+
+      .brandRow{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .brandBadge{
+        width: 100%;
+        border-radius: 20px;
+      }
+      .brandBadge img{
+        width:56px;
+        height:56px;
+      }
+      .kicker{
+        white-space: normal;
+        letter-spacing: .14em;
+        line-height: 1.15;
+      }
+      .title{
+        white-space: normal;
+        font-size: 20px;
+        line-height: 1.18;
+        overflow: visible;
+        text-overflow: clip;
+      }
+
       .pill{ margin-left:0; }
-      .progressWrap{ justify-content:flex-start; }
+
+      .progressWrap{
+        justify-content:flex-start;
+        min-width: 0;
+        width: 100%;
+      }
+      .stepLabel{
+        white-space: normal;
+      }
     }
 
     .opt{
@@ -286,14 +323,6 @@
       white-space:normal;
       overflow-wrap:anywhere;
       max-width:100%;
-    }
-    .optSub{
-      font-size:12.5px;
-      font-weight:800;
-      color: rgba(255,255,255,.78);
-      line-height:1.15;
-      white-space:normal;
-      overflow-wrap:anywhere;
     }
 
     .chev{
@@ -655,7 +684,7 @@
 
     const baseSplit = { device:0.38, install:0.28, elec:0.08, system:0.16, plan:0.10 };
 
-    // --- STEPS (mit 2 Phasen + 7 Realismus-Steps) ---
+    // --- STEPS (Neubau vs Bestand sauber getrennt + 7 Realismus-Steps + Mobile Fix via CSS) ---
     const steps = [
       {
         id: "region",
@@ -663,23 +692,23 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"north",  label:"Norddeutschland", score:0.10, hlh: 2000, designAdj: 1.06 },
-          { value:"middle", label:"Mitteldeutschland", score:0.06, hlh: 1850, designAdj: 1.00 },
-          { value:"south",  label:"Süddeutschland", score:0.04, hlh: 1700, designAdj: 0.96 }
+          { value:"north",  label:"Norddeutschland",  score:0.10, hlh: 2000, designAdj: 1.06 },
+          { value:"middle", label:"Mitteldeutschland",score:0.06, hlh: 1850, designAdj: 1.00 },
+          { value:"south",  label:"Süddeutschland",   score:0.04, hlh: 1700, designAdj: 0.96 }
         ]
       },
       {
         id: "projectType",
-        question: "Neubau oder Bestand (Heizungstausch)?",
-        hint: "Bitte eine Option wählen.",
+        question: "Neubau oder Heizungstausch im Bestandsgebäude?",
+        hint: "Neubau = Gebäude wird neu gebaut. Bestand/Tausch = Wärmepumpe ersetzt eine bestehende Heizung im bestehenden Haus.",
         grid: "cols-2",
         options: [
-          { value:"new", label:"Neubau", score:0.00, add: 0, retrofit: false },
-          { value:"retro", label:"Bestand / Tausch", score:0.20, add: 1400, retrofit: true }
+          { value:"new",   label:"Neubau (Haus wird neu gebaut)",        score:0.00, add: 0,    retrofit: false },
+          { value:"retro", label:"Bestand / Tausch (Heizung wird ersetzt)",score:0.20, add: 1400, retrofit: true }
         ]
       },
 
-      // --- PHASE NEUBAU ---
+      // --- NEUBAU-PHASE ---
       {
         id: "efficiency",
         when: (s)=> s.answers.projectType?.value === "new",
@@ -687,9 +716,9 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"std",  label:"Standard-Neubau (Mindeststandard)",         score:0.10, heatWm2: 35, jazAdj: 0.00 },
-          { value:"eff",  label:"Sehr effizient (bessere Dämmung)",          score:0.06, heatWm2: 28, jazAdj: 0.05 },
-          { value:"prem", label:"Premium (maximale Effizienz)",              score:0.03, heatWm2: 22, jazAdj: 0.10 }
+          { value:"std",  label:"Standard-Neubau (Mindeststandard)", score:0.10, heatWm2: 35, jazAdj: 0.00 },
+          { value:"eff",  label:"Sehr effizient (bessere Dämmung)",  score:0.06, heatWm2: 28, jazAdj: 0.05 },
+          { value:"prem", label:"Premium (maximale Effizienz)",      score:0.03, heatWm2: 22, jazAdj: 0.10 }
         ]
       },
       {
@@ -705,7 +734,7 @@
         ]
       },
 
-      // --- PHASE BESTAND ---
+      // --- BESTAND-PHASE ---
       {
         id: "year",
         when: (s)=> s.answers.projectType?.value === "retro",
@@ -713,9 +742,9 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"pre1978",   label:"bis 1977",     score:0.34, heatWm2: 95 },
-          { value:"1978_2001", label:"1978–2001",   score:0.22, heatWm2: 70 },
-          { value:"2002plus",  label:"ab 2002",     score:0.10, heatWm2: 50 }
+          { value:"pre1978",   label:"bis 1977",   score:0.34, heatWm2: 95 },
+          { value:"1978_2001", label:"1978–2001", score:0.22, heatWm2: 70 },
+          { value:"2002plus",  label:"ab 2002",   score:0.10, heatWm2: 50 }
         ]
       },
       {
@@ -745,16 +774,16 @@
         ]
       },
 
-      // --- GEMEINSAME PHASE (für beide Modi) ---
+      // --- GEMEINSAM ---
       {
         id: "buildingShape",
         question: "Welche Gebäudeform trifft am ehesten zu?",
         hint: "Einfluss auf Wärmeverluste.",
         grid: "cols-3",
         options: [
-          { value:"detached", label:"Freistehend",               score:0.10, shapeFactor: 1.08 },
-          { value:"semi",     label:"Doppelhaushälfte",          score:0.06, shapeFactor: 1.00 },
-          { value:"terrace",  label:"Reihenhaus / Mittelhaus",   score:0.04, shapeFactor: 0.92 }
+          { value:"detached", label:"Freistehend",             score:0.10, shapeFactor: 1.08 },
+          { value:"semi",     label:"Doppelhaushälfte",        score:0.06, shapeFactor: 1.00 },
+          { value:"terrace",  label:"Reihenhaus / Mittelhaus", score:0.04, shapeFactor: 0.92 }
         ]
       },
       {
@@ -763,9 +792,9 @@
         hint: "Größe wählen oder individuell einstellen.",
         grid: "cols-3",
         options: [
-          { value:"small", label:"Klein (ca. 80 m²)",  scoreNorm:0.18, area: 80 },
+          { value:"small", label:"Klein (ca. 80 m²)",   scoreNorm:0.18, area: 80 },
           { value:"mid",   label:"Mittel (ca. 140 m²)", scoreNorm:0.52, area: 140 },
-          { value:"large", label:"Groß (ca. 220 m²)",  scoreNorm:0.90, area: 220 }
+          { value:"large", label:"Groß (ca. 220 m²)",   scoreNorm:0.90, area: 220 }
         ]
       },
       {
@@ -774,35 +803,50 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"ufh", label:"Fußbodenheizung", score:0.06, jazBase: 3.8, sysAdd: 0 },
-          { value:"rads", label:"Heizkörper",     score:0.20, jazBase: 3.2, sysAdd: 900 },
-          { value:"mix", label:"Gemischt",        score:0.14, jazBase: 3.4, sysAdd: 450 }
+          { value:"ufh",  label:"Fußbodenheizung", score:0.06, jazBase: 3.8, sysAdd: 0 },
+          { value:"rads", label:"Heizkörper",      score:0.20, jazBase: 3.2, sysAdd: 900 },
+          { value:"mix",  label:"Gemischt",        score:0.14, jazBase: 3.4, sysAdd: 450 }
         ]
       },
 
-      // Realismus-Step 1: Vorlauftemperatur
+      // Realismus: Vorlauftemperatur
       {
         id: "flowTemp",
         question: "Welche Vorlauftemperatur ist realistisch?",
         hint: "Starker Einfluss auf Effizienz und Umbauaufwand.",
         grid: "cols-3",
         options: [
-          { value:"low",  label:"Niedrig (30–35°C)",  score:0.04, jazAdj: 0.15, sysAdd: 0 },
-          { value:"mid",  label:"Mittel (40–45°C)",   score:0.08, jazAdj: 0.00, sysAdd: 400 },
-          { value:"high", label:"Hoch (50–55°C)",     score:0.14, jazAdj: -0.35, sysAdd: 1400 }
+          { value:"low",  label:"Niedrig (30–35°C)", score:0.04, jazAdj: 0.15, sysAdd: 0 },
+          { value:"mid",  label:"Mittel (40–45°C)",  score:0.08, jazAdj: 0.00, sysAdd: 400 },
+          { value:"high", label:"Hoch (50–55°C)",    score:0.14, jazAdj: -0.35, sysAdd: 1400 }
         ]
       },
 
-      // Realismus-Step 2: Heizflächen-/Hydraulik-Situation
+      // Realismus: Heizflächen/Hydraulik (Neubau: geplant)
       {
-        id: "surfaces",
+        id: "surfacesNew",
+        when: (s)=> s.answers.projectType?.value === "new",
+        question: "Wie ist das Heizflächen-Konzept geplant?",
+        hint: "Einfluss auf Effizienz (Vorlauftemperatur) und Zusatzarbeiten.",
+        grid: "cols-3",
+        options: [
+          { value:"ufh_plan",   label:"Fußbodenheizung geplant (sehr gut)", score:0.02, sysAdd: 0,   jazAdj: 0.06 },
+          { value:"nt_rads",    label:"Große Niedertemperatur-Heizkörper (gut)", score:0.06, sysAdd: 250, jazAdj: 0.00 },
+          { value:"unk_plan",   label:"Unklar / noch nicht geplant", score:0.10, sysAdd: 900, jazAdj: -0.08 }
+        ]
+      },
+
+      // Realismus: Heizflächen/Hydraulik (Bestand: Zustand)
+      {
+        id: "surfacesRetro",
+        when: (s)=> s.answers.projectType?.value === "retro",
         question: "Wie gut passt die Heizflächen-Situation für Wärmepumpe?",
         hint: "Einfluss auf Umbauten und Effizienz.",
         grid: "cols-3",
         options: [
-          { value:"good",   label:"Passt gut (Flächen/modern)",     score:0.04, sysAdd: 0,    jazAdj: 0.05 },
-          { value:"part",   label:"Teilweise (einige Anpassungen)", score:0.10, sysAdd: 900,  jazAdj: -0.05 },
-          { value:"likely", label:"Eher alt (Umbau wahrscheinlich)",score:0.16, sysAdd: 2200, jazAdj: -0.12 }
+          { value:"good",   label:"Passt gut (Flächen/modern)",      score:0.04, sysAdd: 0,    jazAdj: 0.05 },
+          { value:"part",   label:"Teilweise (einige Anpassungen)",  score:0.10, sysAdd: 900,  jazAdj: -0.05 },
+          { value:"likely", label:"Eher alt (Umbau wahrscheinlich)", score:0.16, sysAdd: 2200, jazAdj: -0.12 }
         ]
       },
 
@@ -818,7 +862,7 @@
         ]
       },
 
-      // Realismus-Step 3: Aufstellung (nur Luft/Wasser)
+      // Realismus: Aufstellung (nur Luft/Wasser)
       {
         id: "airSetup",
         when: (s)=> s.answers.source?.value === "air",
@@ -826,22 +870,22 @@
         hint: "Einfluss auf Montage und Zusatzarbeiten.",
         grid: "cols-3",
         options: [
-          { value:"easy",    label:"Einfach (kurze Wege)",                      score:0.04, add: 0 },
-          { value:"normal",  label:"Normal (Fundament + mittlere Leitungswege)",score:0.08, add: 800 },
-          { value:"hard",    label:"Komplex (Schallschutz/weite Wege)",         score:0.14, add: 2000 }
+          { value:"easy",   label:"Einfach (kurze Wege)",                       score:0.04, add: 0 },
+          { value:"normal", label:"Normal (Fundament + mittlere Leitungswege)", score:0.08, add: 800 },
+          { value:"hard",   label:"Komplex (Schallschutz/weite Wege)",          score:0.14, add: 2000 }
         ]
       },
 
-      // Realismus-Step 4: Backup/Bivalenz
+      // Realismus: Backup/Bivalenz
       {
         id: "backup",
         question: "Soll ein Backup für sehr kalte Tage eingeplant werden?",
-        hint: "Kann die benötigte WP-Leistung beeinflussen.",
+        hint: "Kann die benötigte Wärmepumpen-Leistung beeinflussen.",
         grid: "cols-3",
         options: [
-          { value:"none",   label:"Nein (Wärmepumpe deckt alles)",     score:0.08, sizingFactor: 1.00, add: 0,    jazAdj: 0.00 },
-          { value:"stick",  label:"Ja (Heizstab/Backup bewusst)",       score:0.04, sizingFactor: 0.92, add: 350,  jazAdj: 0.00 },
-          { value:"hybrid", label:"Ja (Hybrid / zusätzlicher Erzeuger)",score:0.02, sizingFactor: 0.90, add: 1800, jazAdj: -0.05 }
+          { value:"none",   label:"Nein (Wärmepumpe deckt alles)",      score:0.08, sizingFactor: 1.00, add: 0,    jazAdj: 0.00 },
+          { value:"stick",  label:"Ja (Heizstab/Backup bewusst)",        score:0.04, sizingFactor: 0.92, add: 350,  jazAdj: 0.00 },
+          { value:"hybrid", label:"Ja (Hybrid / zusätzlicher Erzeuger)", score:0.02, sizingFactor: 0.90, add: 1800, jazAdj: -0.05 }
         ]
       },
 
@@ -851,33 +895,53 @@
         hint: "Bitte eine Option wählen.",
         grid: "cols-2",
         options: [
-          { value:"yes", label:"Ja", score:0.12, add: 1100, dhw: true },
-          { value:"no",  label:"Nein", score:0.00, add: 0, dhw: false }
+          { value:"yes", label:"Ja",   score:0.12, add: 1100, dhw: true },
+          { value:"no",  label:"Nein", score:0.00, add: 0,    dhw: false }
         ]
       },
+
+      /* ✅ ÜBERARBEITET: Personen-Ranges + immer sichtbar (kein when) */
       {
         id: "occupants",
-        when: (s)=> s.answers.dhw?.dhw === true,
-        question: "Wie viele Personen leben im Haushalt?",
-        hint: "Einfluss auf Warmwasser-Anteil.",
-        grid: "cols-3",
+        question: "Wie viele Personen nutzen Warmwasser regelmäßig?",
+        hint: "Einfluss auf Warmwasser-Anteil (Duschen/Bad/Verbrauch).",
+        grid: "cols-2",
         options: [
-          { value:1, label:"1 Person", score:0.02, dhwThKwh: 700 },
-          { value:2, label:"2 Personen", score:0.06, dhwThKwh: 1100 },
-          { value:4, label:"4 Personen", score:0.12, dhwThKwh: 1700 }
+          { value:"1-2", label:"1–2 Personen", score:0.03, dhwThKwh: 1200 },
+          { value:"3-4", label:"3–4 Personen", score:0.06, dhwThKwh: 1900 },
+          { value:"5-6", label:"5–6 Personen", score:0.09, dhwThKwh: 2700 },
+          { value:"7-8", label:"7–8 Personen", score:0.12, dhwThKwh: 3500 }
         ]
       },
+
+      // Elektro split: Neubau (Planung)
       {
-        id: "elecComplexity",
+        id: "elecNew",
+        when: (s)=> s.answers.projectType?.value === "new",
+        question: "Elektro / Hausanschluss – was ist geplant?",
+        hint: "Einfluss auf Anschluss/Absicherung und mögliche Zusatzarbeiten.",
+        grid: "cols-3",
+        options: [
+          { value:"planned", label:"Neu geplant (passend ausgelegt)",          score:0.02, elecAdd: 0 },
+          { value:"more",    label:"Mehrleistung nötig (prüfen lassen)",       score:0.10, elecAdd: 1400 },
+          { value:"unk",     label:"Unklar",                                   score:0.08, elecAdd: 900 }
+        ]
+      },
+
+      // Elektro split: Bestand (Zustand)
+      {
+        id: "elecRetro",
+        when: (s)=> s.answers.projectType?.value === "retro",
         question: "Elektro / Zählerschrank – welcher Zustand ist wahrscheinlich?",
         hint: "Bitte eine Option wählen.",
         grid: "cols-3",
         options: [
-          { value:"standard", label:"Standard – Anschluss möglich",             score:0.04, elecAdd: 700 },
-          { value:"upgrade",  label:"Upgrade nötig – Schrank/Absicherung",      score:0.18, elecAdd: 2400 },
-          { value:"unknown",  label:"Unklar",                                   score:0.10, elecAdd: 1400 }
+          { value:"standard", label:"Standard – Anschluss möglich",        score:0.04, elecAdd: 700 },
+          { value:"upgrade",  label:"Upgrade nötig – Schrank/Absicherung", score:0.18, elecAdd: 2400 },
+          { value:"unknown",  label:"Unklar",                              score:0.10, elecAdd: 1400 }
         ]
       },
+
       {
         id: "elecPrice",
         question: "Welchen Strompreis soll die Rechnung ansetzen?",
@@ -903,28 +967,29 @@
       { id:"result", question:"Preisinformation", hint:"Hier steht das Ergebnis.", grid:"cols-2", options:[] }
     ];
 
-    // Gewichte (nur für Preis-SCORE – Betriebskosten werden separat technisch gerechnet)
     const weights = {
-      region:          0.04,
-      projectType:     0.08,
-      efficiency:      0.10,
-      ventilation:     0.04,
-      year:            0.10,
-      insulation:      0.10,
-      consumption:     0.04,
-      buildingShape:   0.05,
-      area:            0.18,
-      emitters:        0.08,
-      flowTemp:        0.10,
-      surfaces:        0.10,
-      source:          0.06,
-      airSetup:        0.04,
-      backup:          0.04,
-      dhw:             0.04,
-      occupants:       0.02,
-      elecComplexity:  0.05,
-      elecPrice:       0.00,
-      timing:          0.02
+      region:        0.04,
+      projectType:   0.08,
+      efficiency:    0.10,
+      ventilation:   0.04,
+      year:          0.10,
+      insulation:    0.10,
+      consumption:   0.04,
+      buildingShape: 0.05,
+      area:          0.18,
+      emitters:      0.08,
+      flowTemp:      0.10,
+      surfacesNew:   0.06,
+      surfacesRetro: 0.10,
+      source:        0.06,
+      airSetup:      0.04,
+      backup:        0.04,
+      dhw:           0.04,
+      occupants:     0.02,
+      elecNew:       0.04,
+      elecRetro:     0.05,
+      elecPrice:     0.00,
+      timing:        0.02
     };
 
     const state = { stepIndex:0, answers:{} };
@@ -1000,6 +1065,13 @@
       elHeightRange.addEventListener(evt, updateAreaLive);
     });
 
+    function getSurfacesAnswer(){
+      return state.answers.surfacesNew || state.answers.surfacesRetro || null;
+    }
+    function getElecAnswer(){
+      return state.answers.elecNew || state.answers.elecRetro || null;
+    }
+
     function computeTech(){
       const region = state.answers.region;
       const hlh = region?.hlh ?? 1850;
@@ -1011,7 +1083,6 @@
 
       const mode = state.answers.projectType?.value ?? "retro";
 
-      // --- Basis: W/m² je nach Modus ---
       let baseWm2 = 70;
       let insFactor = 1.0;
 
@@ -1027,34 +1098,25 @@
         insFactor = ins?.factor ?? 1.0;
       }
 
-      // Gebäudeform-Faktor
       const shapeFactor = state.answers.buildingShape?.shapeFactor ?? 1.0;
-
-      // Deckenhöhe-Faktor
       const heightFactor = Math.max(0.90, Math.min(1.25, height / 2.4));
 
-      // Vorlauftemperatur wirkt stark auf JAZ (und indirekt Umbau)
-      const flow = state.answers.flowTemp;
-      const flowJazAdj = flow?.jazAdj ?? 0.0;
-
-      // Heizflächen-/Hydraulik wirkt leicht auf JAZ
-      const surf = state.answers.surfaces;
-      const surfJazAdj = surf?.jazAdj ?? 0.0;
-
-      // Wärmeverteilung
       const emit = state.answers.emitters;
       const jazBase = emit?.jazBase ?? 3.4;
 
-      // Wärmepumpenart
       const source = state.answers.source;
       const srcJazAdj = source?.jazAdj ?? 0.0;
 
-      // Neubau: Lüftung mit WRG senkt Bedarf + minimaler JAZ Boost
       const vent = state.answers.ventilation;
       const ventHeatFactor = (mode === "new") ? (vent?.heatFactor ?? 1.0) : 1.0;
       const ventJazAdj = (mode === "new") ? (vent?.jazAdj ?? 0.0) : 0.0;
 
-      // Bestand: Gebäudeeffekt auf JAZ durch Sanierungsgrad
+      const flow = state.answers.flowTemp;
+      const flowJazAdj = flow?.jazAdj ?? 0.0;
+
+      const surf = getSurfacesAnswer();
+      const surfJazAdj = surf?.jazAdj ?? 0.0;
+
       let jazBuildingAdj = 0;
       if (mode !== "new"){
         const ins = state.answers.insulation;
@@ -1062,7 +1124,6 @@
         if ((ins?.value ?? "mid") === "good") jazBuildingAdj += 0.10;
       }
 
-      // Region und Heizkörper
       let jazRegionAdj = 0;
       if ((region?.value ?? "middle") === "north") jazRegionAdj -= 0.10;
       if ((region?.value ?? "middle") === "south") jazRegionAdj += 0.05;
@@ -1070,23 +1131,21 @@
       let jazEmitterAdj = 0;
       if ((emit?.value ?? "mix") === "rads") jazEmitterAdj -= 0.10;
 
-      // Backup-Konzept: minimaler JAZ Effekt (Hybrid leicht schlechter)
       const backup = state.answers.backup;
       const backupJazAdj = backup?.jazAdj ?? 0.0;
 
       let jaz = jazBase + srcJazAdj + ventJazAdj + flowJazAdj + surfJazAdj + jazBuildingAdj + jazRegionAdj + jazEmitterAdj + backupJazAdj;
       jaz = Math.max(2.4, Math.min(4.6, jaz));
 
-      // --- Heizleistung (kW) ---
+      // Heizleistung
       let kw = (area * baseWm2 * insFactor * heightFactor * designAdj * shapeFactor) / 1000;
 
-      // Bestand: Verbrauchs-Shortcut (überschreibt die kW-Ableitung)
+      // Bestand: Verbrauchs-Shortcut
       const cons = state.answers.consumption;
       const consHeat = (mode === "retro") ? (cons?.heatThKwh ?? null) : null;
       let heat_th;
 
       if (mode === "retro" && typeof consHeat === "number"){
-        // konservative Korrektur für "Heizung" (nicht 1:1, aber näher an Praxis)
         const corrected = consHeat * 0.92;
         heat_th = corrected;
         kw = corrected / hlh;
@@ -1097,18 +1156,15 @@
       // Lüftung WRG: senkt Bedarf (Neubau)
       heat_th = heat_th * ventHeatFactor;
 
-      // Warmwasser
       const dhw = state.answers.dhw?.dhw === true;
-      const occ = state.answers.occupants?.dhwThKwh ?? 1100;
+      const occ = state.answers.occupants?.dhwThKwh ?? 1200;
       const dhw_th = dhw ? occ : 0;
 
-      // Stromverbrauch
       const kwh_el = (heat_th + dhw_th) / jaz;
 
       const p = state.answers.elecPrice?.value ?? 0.32;
       const cost = kwh_el * p;
 
-      // Sizing-Faktor für Preislogik (Backup erlaubt kleinere WP)
       const sizingFactor = backup?.sizingFactor ?? 1.0;
       const kwSizing = kw * sizingFactor;
 
@@ -1162,13 +1218,14 @@
         if (typeof ans.add === "number") add += ans.add;
       }
 
-      // Elektro
-      add += (state.answers.elecComplexity?.elecAdd ?? 0);
+      // Elektro (aus Neubau oder Bestand)
+      const elecAns = getElecAnswer();
+      add += (elecAns?.elecAdd ?? 0);
 
-      // System-Add-ons (aus mehreren Steps)
+      // System-Add-ons
       add += (state.answers.emitters?.sysAdd ?? 0);
       add += (state.answers.flowTemp?.sysAdd ?? 0);
-      add += (state.answers.surfaces?.sysAdd ?? 0);
+      add += (getSurfacesAnswer()?.sysAdd ?? 0);
 
       // Bestand-Pauschale
       const isRetro = (state.answers.projectType?.retrofit === true);
@@ -1185,25 +1242,30 @@
     }
 
     function dynamicSplit(total, tech){
-      const e = state.answers.elecComplexity?.value ?? "unknown";
+      const elecAns = getElecAnswer();
+      const e = elecAns?.value ?? "unknown";
+
       let elecShare = baseSplit.elec;
       if (e === "standard") elecShare = 0.06;
       if (e === "unknown")  elecShare = 0.08;
       if (e === "upgrade")  elecShare = 0.10;
+
+      // Neubau-Optionen: planned/more/unk
+      if (e === "planned") elecShare = 0.06;
+      if (e === "more")    elecShare = 0.09;
+      if (e === "unk")     elecShare = 0.08;
 
       const retro = state.answers.projectType?.retrofit === true;
 
       let systemShare = baseSplit.system;
       if (retro) systemShare += 0.02;
 
-      // Wenn hohe Vorlauftemperatur / Umbau wahrscheinlich: Systemanteil minimal hoch
       const flow = state.answers.flowTemp?.value ?? "mid";
       if (flow === "high") systemShare += 0.02;
 
-      const surf = state.answers.surfaces?.value ?? "part";
-      if (surf === "likely") systemShare += 0.02;
+      const surf = getSurfacesAnswer()?.value ?? "part";
+      if (surf === "likely" || surf === "unk_plan") systemShare += 0.02;
 
-      // Luft/Wasser komplex: Installation etwas höher
       let installShare = baseSplit.install;
       const airSetup = state.answers.airSetup?.value ?? "normal";
       if (airSetup === "hard") installShare += 0.02;
@@ -1309,7 +1371,7 @@
         btn.appendChild(chev);
 
         btn.addEventListener("click", ()=>{
-          // Pfadwechsel sauber halten
+          // Projektart: Antworten auf den jeweils anderen Pfad löschen
           if (step.id === "projectType"){
             state.answers.projectType = opt;
 
@@ -1317,16 +1379,19 @@
               delete state.answers.year;
               delete state.answers.insulation;
               delete state.answers.consumption;
+              delete state.answers.surfacesRetro;
+              delete state.answers.elecRetro;
             } else {
               delete state.answers.efficiency;
               delete state.answers.ventilation;
+              delete state.answers.surfacesNew;
+              delete state.answers.elecNew;
             }
-
             goNext();
             return;
           }
 
-          // Quelle: airSetup nur anzeigen, wenn Luft/Wasser
+          // Quelle: airSetup nur bei Luft/Wasser
           if (step.id === "source"){
             state.answers.source = opt;
             if (opt.value !== "air") delete state.answers.airSetup;
@@ -1334,10 +1399,9 @@
             return;
           }
 
-          // Warmwasser: occupants nur wenn Ja
+          // Warmwasser: occupants bleibt als Auswahl, wirkt aber nur wenn dhw=true (computeTech)
           if (step.id === "dhw"){
             state.answers.dhw = opt;
-            if (opt.dhw !== true) delete state.answers.occupants;
             goNext();
             return;
           }
@@ -1355,6 +1419,7 @@
             return;
           }
 
+          // Standard speichern
           state.answers[step.id] = opt;
           goNext();
         });
