@@ -22,6 +22,11 @@
       --accent1:#b3003c;
       --accent2:#6b2cff;
       --accentGlow: 0 0 0 2px rgba(179,0,60,.35), 0 0 40px rgba(107,44,255,.25), 0 0 90px rgba(179,0,60,.18);
+
+      /* Motion */
+      --easeOut: cubic-bezier(.2,.9,.2,1);
+      --easeInOut: cubic-bezier(.4,0,.2,1);
+      --pressScale: .985;
     }
 
     *{ box-sizing:border-box; }
@@ -44,7 +49,6 @@
       align-items:center;
       justify-content:center;
       padding:46px 18px;
-      /* Handy: unten genug Luft + Safe-Area */
       padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px));
     }
 
@@ -174,6 +178,7 @@
       width:0%;
       background: linear-gradient(90deg, rgba(107,44,255,.95), rgba(179,0,60,.95));
       box-shadow: 0 0 30px rgba(179,0,60,.25);
+      transition: width 420ms var(--easeOut);
     }
     .stepLabel{
       font-size:12px;
@@ -188,7 +193,6 @@
         radial-gradient(900px 340px at 10% 30%, rgba(107,44,255,.10), transparent 55%),
         radial-gradient(900px 340px at 90% 40%, rgba(179,0,60,.10), transparent 55%),
         linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.60));
-      /* Ergebnisbereich: unten genug Luft + Safe-Area */
       padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     }
 
@@ -241,7 +245,6 @@
       .grid.cols-3{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
-    /* MOBILE: nur Header-Fix (Desktop bleibt unverändert) */
     @media (max-width: 680px){
       .grid.cols-2, .grid.cols-3{ grid-template-columns: 1fr; }
 
@@ -296,7 +299,7 @@
       box-shadow: 0 18px 55px rgba(0,0,0,.35);
       padding:18px 18px;
       cursor:pointer;
-      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, filter .15s ease;
+      transition: transform 220ms var(--easeOut), border-color 220ms var(--easeOut), box-shadow 220ms var(--easeOut), filter 220ms var(--easeOut);
       min-height: 88px;
       display:flex;
       align-items:center;
@@ -305,11 +308,33 @@
       outline:none;
       user-select:none;
       overflow:hidden;
+      transform: translateZ(0);
+      will-change: transform, box-shadow;
+    }
+    .opt::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: 24px;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity 240ms var(--easeOut);
+      box-shadow: var(--accentGlow);
     }
     .opt:hover{
       transform: translateY(-1px);
       border-color: rgba(255,255,255,.22);
       filter: brightness(1.03);
+    }
+    .opt:active{
+      transform: translateY(0) scale(var(--pressScale));
+    }
+    .opt.isSelected{
+      border-color: rgba(255,255,255,.26);
+      filter: brightness(1.05);
+    }
+    .opt.isSelected::after{
+      opacity:1;
     }
 
     .optText{
@@ -339,7 +364,9 @@
       background: rgba(0,0,0,.18);
       color: rgba(255,255,255,.92);
       flex:0 0 auto;
+      transition: transform 240ms var(--easeOut), background 240ms var(--easeOut);
     }
+    .opt:hover .chev{ transform: translateX(1px); }
     .chev svg{ width:18px;height:18px; opacity:.95; }
 
     .panelFoot{
@@ -363,15 +390,20 @@
       color: rgba(255,255,255,.95);
       background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.14);
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      transition: transform 220ms var(--easeOut), background 220ms var(--easeOut), border-color 220ms var(--easeOut), box-shadow 220ms var(--easeOut);
       display:flex;
       align-items:center;
       gap:10px;
+      transform: translateZ(0);
+      will-change: transform;
     }
     .btn:hover{
       transform: translateY(-1px);
       background: rgba(255,255,255,.14);
       border-color: rgba(255,255,255,.20);
+    }
+    .btn:active{
+      transform: translateY(0) scale(var(--pressScale));
     }
     .btn:disabled{
       opacity:.45;
@@ -385,6 +417,7 @@
     }
     .btnPrimary:hover{
       background: linear-gradient(90deg, rgba(107,44,255,1), rgba(179,0,60,1));
+      box-shadow: 0 18px 55px rgba(179,0,60,.26);
     }
 
     .meta{
@@ -399,7 +432,6 @@
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
       padding:16px 16px;
-      /* Handy: Ergebnis nicht an den Rand pressen */
       margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     }
     .resultHead{
@@ -501,6 +533,12 @@
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       padding:12px 12px;
+      transition: transform 220ms var(--easeOut), border-color 220ms var(--easeOut), box-shadow 220ms var(--easeOut);
+    }
+    .sItem:focus-within{
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 2px rgba(255,255,255,.10), 0 18px 55px rgba(0,0,0,.28);
+      transform: translateY(-1px);
     }
     .sLabel{
       display:flex;
@@ -516,11 +554,58 @@
       color: rgba(255,255,255,.95);
       font-weight:950;
       white-space:nowrap;
+      transition: transform 220ms var(--easeOut);
     }
+    .sItem.isAdjusting .sValue{
+      transform: scale(1.03);
+    }
+
+    /* Range – animierte Track-Füllung + Thumb Feedback */
     input[type="range"]{
       width:100%;
-      accent-color: var(--accent2);
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      outline: none;
+      background:
+        linear-gradient(90deg, rgba(107,44,255,.95), rgba(179,0,60,.95)) 0/ var(--fill, 50%) 100% no-repeat,
+        rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.14);
+      transition: background-size 240ms var(--easeOut), filter 240ms var(--easeOut);
     }
+    input[type="range"]:hover{
+      filter: brightness(1.04);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
+      border: 2px solid rgba(0,0,0,.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      transition: transform 180ms var(--easeOut), box-shadow 180ms var(--easeOut);
+    }
+    input[type="range"]:active::-webkit-slider-thumb{
+      transform: scale(1.12);
+      box-shadow: 0 14px 44px rgba(0,0,0,.45);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
+      border: 2px solid rgba(0,0,0,.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      transition: transform 180ms var(--easeOut), box-shadow 180ms var(--easeOut);
+    }
+    input[type="range"]:active::-moz-range-thumb{
+      transform: scale(1.12);
+      box-shadow: 0 14px 44px rgba(0,0,0,.45);
+    }
+
     .applyRow{
       display:flex;
       gap:12px;
@@ -528,6 +613,156 @@
       margin-top:12px;
       align-items:center;
       justify-content:flex-end;
+    }
+
+    /* Step / Content Animations */
+    .fadeIn{
+      animation: fadeInUp 380ms var(--easeOut) both;
+    }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform: translateY(8px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    .pulse{
+      animation: pulseGlow 520ms var(--easeOut) both;
+    }
+    @keyframes pulseGlow{
+      0%{ transform: translateY(0); filter: brightness(1); }
+      45%{ transform: translateY(-1px); filter: brightness(1.06); }
+      100%{ transform: translateY(0); filter: brightness(1); }
+    }
+
+    /* Modal */
+    .modalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 22px 16px;
+      z-index: 9999;
+    }
+    .modalOverlay.isOpen{ display:flex; }
+
+    .modalCard{
+      width: min(740px, 100%);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(900px 420px at 10% 20%, rgba(107,44,255,.16), transparent 60%),
+        radial-gradient(900px 420px at 90% 20%, rgba(179,0,60,.14), transparent 60%),
+        rgba(10,10,14,.88);
+      box-shadow: 0 40px 120px rgba(0,0,0,.65);
+      overflow:hidden;
+      transform: translateY(8px) scale(.98);
+      opacity:0;
+      animation: modalIn 360ms var(--easeOut) forwards;
+    }
+    @keyframes modalIn{
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+    .modalHead{
+      padding:18px 18px 12px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .modalTitle{
+      margin:0;
+      font-size:18px;
+      font-weight:950;
+      line-height:1.2;
+    }
+    .modalSub{
+      margin:6px 0 0 0;
+      color: rgba(255,255,255,.76);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .modalClose{
+      width:40px;height:40px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.92);
+    }
+    .modalBody{
+      padding: 14px 18px 18px 18px;
+    }
+    .formGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 680px){
+      .formGrid{ grid-template-columns: 1fr; }
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .label{
+      font-size:12px;
+      font-weight:850;
+      color: rgba(255,255,255,.84);
+    }
+    .input{
+      width:100%;
+      border-radius: 14px;
+      padding: 12px 12px;
+      color: rgba(255,255,255,.94);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      outline:none;
+      transition: border-color 220ms var(--easeOut), box-shadow 220ms var(--easeOut), transform 220ms var(--easeOut);
+    }
+    .input:focus{
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 2px rgba(255,255,255,.10), 0 0 0 6px rgba(179,0,60,.10);
+      transform: translateY(-1px);
+    }
+    .checkRow{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color: rgba(255,255,255,.82);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .checkRow input{
+      margin-top:3px;
+      width:18px;height:18px;
+      accent-color: var(--accent2);
+    }
+    .formFoot{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .errorText{
+      font-size:12px;
+      color: rgba(255,107,107,.95);
+      font-weight:850;
+      display:none;
+      margin-top:10px;
+    }
+    .errorText.isOpen{ display:block; }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+      .modalCard{ opacity:1; transform:none; }
     }
   </style>
 </head>
@@ -590,7 +825,7 @@
                 </p>
 
                 <div class="sliders">
-                  <div class="sItem">
+                  <div class="sItem" id="areaItem">
                     <div class="sLabel">
                       <span>Wohnfläche</span>
                       <span class="sValue" id="areaVal">140 m²</span>
@@ -598,7 +833,7 @@
                     <input id="areaRange" type="range" min="40" max="300" step="5" value="140" />
                   </div>
 
-                  <div class="sItem">
+                  <div class="sItem" id="heightItem">
                     <div class="sLabel">
                       <span>Deckenhöhe</span>
                       <span class="sValue" id="heightVal">2,4 m</span>
@@ -656,10 +891,11 @@
                 </table>
 
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;">
-                  <a class="btn btnPrimary" id="ctaLink" href="https://elitebau-hamburg.de/kontakt" target="_blank" rel="noopener">
+                  <!-- Button öffnet Modal (Mail wird vorbefüllt) -->
+                  <button class="btn btnPrimary" id="ctaOpen" type="button">
                     Kostenlose Vor-Ort-Einschätzung anfragen
                     <span aria-hidden="true">↗</span>
-                  </a>
+                  </button>
                 </div>
 
                 <div class="note">
@@ -685,8 +921,61 @@
     </div>
   </div>
 
+  <!-- Modal -->
+  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHead">
+        <div>
+          <h3 class="modalTitle" id="modalTitle">Anfrage für eine Vor-Ort-Einschätzung</h3>
+          <p class="modalSub">
+            Deine Angaben werden in eine vorbefüllte E-Mail übernommen – inklusive aller Ergebnisse aus dem Rechner.
+          </p>
+        </div>
+        <button class="modalClose btn" type="button" id="modalClose" aria-label="Schließen">
+          ✕
+        </button>
+      </div>
+
+      <div class="modalBody">
+        <div class="formGrid">
+          <div class="field">
+            <div class="label">Name*</div>
+            <input class="input" id="leadName" type="text" autocomplete="name" placeholder="Vor- und Nachname" />
+          </div>
+          <div class="field">
+            <div class="label">E-Mail*</div>
+            <input class="input" id="leadEmail" type="email" autocomplete="email" placeholder="name@beispiel.de" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <div class="label">Telefon (optional)</div>
+            <input class="input" id="leadPhone" type="tel" autocomplete="tel" placeholder="+49 …" />
+          </div>
+        </div>
+
+        <div class="checkRow">
+          <input id="leadConsent" type="checkbox" />
+          <label for="leadConsent">
+            Ich bin einverstanden, dass meine Angaben zum Zweck der Kontaktaufnahme verarbeitet werden. Mir ist bekannt, dass ich meine Einwilligung jederzeit widerrufen kann.*
+          </label>
+        </div>
+
+        <div class="errorText" id="leadError">Bitte Name, E-Mail und Einwilligung vollständig angeben.</div>
+
+        <div class="formFoot">
+          <button class="btn" type="button" id="modalCancel">Abbrechen</button>
+          <button class="btn btnPrimary" type="button" id="leadSend">
+            Anfrage vorbereiten
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const CTA_URL = "https://elitebau-hamburg.de/kontakt";
+    const LEAD_TO_EMAIL = "info@elitebau-hamburg.de";
+
     const BASE_MIN = 24500;
     const BASE_MAX = 39500;
 
@@ -988,9 +1277,9 @@
       consumption:   0.04,
       buildingShape: 0.05,
       area:          0.18,
-      emitters:      0.08,   // nur Bestand
+      emitters:      0.08,
       flowTemp:      0.10,
-      surfacesNew:   0.08,   // Neubau ersetzt emitters
+      surfacesNew:   0.08,
       surfacesRetro: 0.10,
       source:        0.06,
       airSetup:      0.04,
@@ -1028,8 +1317,7 @@
     const elCKwh       = document.getElementById("cKwh");
     const elCCost      = document.getElementById("cCost");
 
-    const elCtaLink    = document.getElementById("ctaLink");
-    elCtaLink.href = CTA_URL;
+    const elCtaOpen    = document.getElementById("ctaOpen");
 
     const elAreaCustomWrap = document.getElementById("areaCustomWrap");
     const elAreaRange  = document.getElementById("areaRange");
@@ -1038,6 +1326,20 @@
     const elHeightVal  = document.getElementById("heightVal");
     const elAreaLive   = document.getElementById("areaLive");
     const elApplyAreaBtn = document.getElementById("applyAreaBtn");
+
+    const elAreaItem   = document.getElementById("areaItem");
+    const elHeightItem = document.getElementById("heightItem");
+
+    // Modal refs
+    const elModalOverlay = document.getElementById("modalOverlay");
+    const elModalClose   = document.getElementById("modalClose");
+    const elModalCancel  = document.getElementById("modalCancel");
+    const elLeadName     = document.getElementById("leadName");
+    const elLeadEmail    = document.getElementById("leadEmail");
+    const elLeadPhone    = document.getElementById("leadPhone");
+    const elLeadConsent  = document.getElementById("leadConsent");
+    const elLeadSend     = document.getElementById("leadSend");
+    const elLeadError    = document.getElementById("leadError");
 
     function euro(n){ return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"}).format(n); }
     function clamp01(x){ return Math.min(1, Math.max(0, x)); }
@@ -1063,6 +1365,20 @@
       elFooterMeta.textContent = `Schritt ${current} von ${totalSteps}`;
     }
 
+    function setRangeFill(range){
+      const min = parseFloat(range.min || "0");
+      const max = parseFloat(range.max || "100");
+      const val = parseFloat(range.value || "0");
+      const pct = ((val - min) / (max - min)) * 100;
+      range.style.setProperty("--fill", `${Math.max(0, Math.min(100, pct))}%`);
+    }
+
+    function markAdjusting(itemEl){
+      itemEl.classList.add("isAdjusting");
+      window.clearTimeout(itemEl.__t);
+      itemEl.__t = window.setTimeout(()=> itemEl.classList.remove("isAdjusting"), 220);
+    }
+
     function updateAreaLive(){
       const a = parseFloat(elAreaRange.value);
       const h = parseFloat(elHeightRange.value);
@@ -1071,9 +1387,18 @@
       elAreaLive.textContent = `Wohnfläche: ${Math.round(a)} m² · Höhe: ${h.toFixed(1).replace(".",",")} m`;
       return { area:a, height:h };
     }
+
     ["input","change"].forEach(evt=>{
-      elAreaRange.addEventListener(evt, updateAreaLive);
-      elHeightRange.addEventListener(evt, updateAreaLive);
+      elAreaRange.addEventListener(evt, ()=>{
+        setRangeFill(elAreaRange);
+        updateAreaLive();
+        markAdjusting(elAreaItem);
+      });
+      elHeightRange.addEventListener(evt, ()=>{
+        setRangeFill(elHeightRange);
+        updateAreaLive();
+        markAdjusting(elHeightItem);
+      });
     });
 
     function getSurfacesAnswer(){
@@ -1083,7 +1408,6 @@
       return state.answers.elecNew || state.answers.elecRetro || null;
     }
     function getEmitterAnswer(){
-      // Neubau: Heizflächen-Konzept liefert jazBase (statt emitters)
       if (state.answers.projectType?.value === "new") return state.answers.surfacesNew || null;
       return state.answers.emitters || null;
     }
@@ -1153,10 +1477,8 @@
       let jaz = jazBase + srcJazAdj + ventJazAdj + flowJazAdj + surfJazAdj + jazBuildingAdj + jazRegionAdj + jazEmitterAdj + backupJazAdj;
       jaz = Math.max(2.4, Math.min(4.6, jaz));
 
-      // Heizleistung
       let kw = (area * baseWm2 * insFactor * heightFactor * designAdj * shapeFactor) / 1000;
 
-      // Bestand: Verbrauchs-Shortcut
       const cons = state.answers.consumption;
       const consHeat = (mode === "retro") ? (cons?.heatThKwh ?? null) : null;
       let heat_th;
@@ -1169,7 +1491,6 @@
         heat_th = kw * hlh;
       }
 
-      // Lüftung WRG: senkt Bedarf (Neubau)
       heat_th = heat_th * ventHeatFactor;
 
       const dhw = state.answers.dhw?.dhw === true;
@@ -1234,20 +1555,16 @@
         if (typeof ans.add === "number") add += ans.add;
       }
 
-      // Elektro (aus Neubau oder Bestand)
       const elecAns = getElecAnswer();
       add += (elecAns?.elecAdd ?? 0);
 
-      // System-Add-ons
-      add += (state.answers.emitters?.sysAdd ?? 0);     // nur Bestand
+      add += (state.answers.emitters?.sysAdd ?? 0);
       add += (state.answers.flowTemp?.sysAdd ?? 0);
-      add += (getSurfacesAnswer()?.sysAdd ?? 0);        // Neubau + Bestand (Konzept / Anpassungsbedarf)
+      add += (getSurfacesAnswer()?.sysAdd ?? 0);
 
-      // Bestand-Pauschale
       const isRetro = (state.answers.projectType?.retrofit === true);
       if (isRetro) add += 650;
 
-      // Preis-Skalierung nach kW (Sizing-kW, nicht reine kW)
       const kw = tech.kwSizing ?? tech.kw;
       const kwRef = 8.0;
       const kwFactor = Math.max(0.90, Math.min(1.14, 1 + ((kw - kwRef) / 40)));
@@ -1266,7 +1583,6 @@
       if (e === "unknown")  elecShare = 0.08;
       if (e === "upgrade")  elecShare = 0.10;
 
-      // Neubau-Optionen: planned/more/unk
       if (e === "planned") elecShare = 0.06;
       if (e === "more")    elecShare = 0.09;
       if (e === "unk")     elecShare = 0.08;
@@ -1322,6 +1638,49 @@
       return out;
     }
 
+    function triggerFade(el){
+      el.classList.remove("fadeIn");
+      void el.offsetWidth;
+      el.classList.add("fadeIn");
+    }
+
+    function setSelectedUI(stepId){
+      const opts = elOptions.querySelectorAll(".opt");
+      opts.forEach(btn=>{
+        btn.classList.remove("isSelected");
+        const v = btn.getAttribute("data-value");
+        const ans = state.answers[stepId];
+        if (ans && v && (ans.value + "") === (v + "")) btn.classList.add("isSelected");
+      });
+    }
+
+    function animateNumber(el, target, formatFn){
+      const prefersReduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReduce){
+        el.textContent = formatFn(target);
+        return;
+      }
+
+      const startText = el.getAttribute("data-last");
+      const start = (startText !== null && startText !== "") ? parseFloat(startText) : (isFinite(target) ? target : 0);
+      const end = isFinite(target) ? target : 0;
+      const diff = end - start;
+
+      const dur = 520;
+      const t0 = performance.now();
+
+      function tick(t){
+        const p = Math.min(1, (t - t0) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = start + diff * eased;
+        el.textContent = formatFn(val);
+        if (p < 1) requestAnimationFrame(tick);
+        else el.setAttribute("data-last", String(end));
+      }
+
+      requestAnimationFrame(tick);
+    }
+
     function render(){
       const { act, step } = currentActive();
       const totalSteps = act.length;
@@ -1331,12 +1690,20 @@
       elQuestion.textContent = step.question;
       elHint.textContent = step.hint;
 
+      triggerFade(elQuestion);
+      triggerFade(elHint);
+
       elOptions.className = `grid ${step.grid || "cols-2"}`;
       elOptions.innerHTML = "";
       elResultWrap.style.display = "none";
 
       elAreaCustomWrap.style.display = (step.id === "area") ? "block" : "none";
-      if (step.id === "area") updateAreaLive();
+      if (step.id === "area"){
+        setRangeFill(elAreaRange);
+        setRangeFill(elHeightRange);
+        updateAreaLive();
+        triggerFade(elAreaCustomWrap);
+      }
 
       elBack.disabled = state.stepIndex === 0;
 
@@ -1344,20 +1711,21 @@
         const { total, tech } = computeTotal();
         const b = breakdown(total, tech);
 
-        elTotalOut.textContent = euro(total);
-        elCDevice.textContent  = euro(b.device);
-        elCInstall.textContent = euro(b.install);
-        elCElec.textContent    = euro(b.elec);
-        elCSystem.textContent  = euro(b.system);
-        elCPlan.textContent    = euro(b.plan);
+        animateNumber(elTotalOut, total, (v)=> euro(v));
+        animateNumber(elCDevice,  b.device, (v)=> euro(v));
+        animateNumber(elCInstall, b.install, (v)=> euro(v));
+        animateNumber(elCElec,    b.elec, (v)=> euro(v));
+        animateNumber(elCSystem,  b.system, (v)=> euro(v));
+        animateNumber(elCPlan,    b.plan, (v)=> euro(v));
 
-        elKwOut.textContent = `${tech.kw.toFixed(1).replace(".",",")} kW`;
-        elCKw.textContent   = `${tech.kw.toFixed(1).replace(".",",")} kW (überschlägig)`;
-        elCJaz.textContent  = `${tech.jaz.toFixed(2).replace(".",",")}`;
-        elCKwh.textContent  = `${tech.kwh_el.toLocaleString("de-DE")} kWh`;
-        elCCost.textContent = euro(tech.cost);
+        animateNumber(elKwOut, tech.kw, (v)=> `${v.toFixed(1).replace(".",",")} kW`);
+        animateNumber(elCKw,   tech.kw, (v)=> `${v.toFixed(1).replace(".",",")} kW (überschlägig)`);
+        animateNumber(elCJaz,  tech.jaz, (v)=> `${v.toFixed(2).replace(".",",")}`);
+        animateNumber(elCKwh,  tech.kwh_el, (v)=> `${Math.round(v).toLocaleString("de-DE")} kWh`);
+        animateNumber(elCCost, tech.cost, (v)=> euro(v));
 
         elResultWrap.style.display = "block";
+        triggerFade(elResultWrap);
         return;
       }
 
@@ -1365,6 +1733,7 @@
         const btn = document.createElement("button");
         btn.type="button";
         btn.className="opt";
+        btn.setAttribute("data-value", opt.value);
 
         const text = document.createElement("div");
         text.className="optText";
@@ -1387,7 +1756,10 @@
         btn.appendChild(chev);
 
         btn.addEventListener("click", ()=>{
-          // Projektart: Antworten auf den jeweils anderen Pfad löschen
+          elOptions.classList.remove("pulse");
+          void elOptions.offsetWidth;
+          elOptions.classList.add("pulse");
+
           if (step.id === "projectType"){
             state.answers.projectType = opt;
 
@@ -1408,7 +1780,6 @@
             return;
           }
 
-          // Quelle: airSetup nur bei Luft/Wasser
           if (step.id === "source"){
             state.answers.source = opt;
             if (opt.value !== "air") delete state.answers.airSetup;
@@ -1416,7 +1787,6 @@
             return;
           }
 
-          // Warmwasser: occupants nur wenn Ja
           if (step.id === "dhw"){
             state.answers.dhw = opt;
             if (opt.dhw !== true) delete state.answers.occupants;
@@ -1424,7 +1794,6 @@
             return;
           }
 
-          // Fläche
           if (step.id === "area"){
             state.answers.area = {
               value: opt.value,
@@ -1437,13 +1806,15 @@
             return;
           }
 
-          // Standard speichern
           state.answers[step.id] = opt;
           goNext();
         });
 
         elOptions.appendChild(btn);
       });
+
+      setSelectedUI(step.id);
+      triggerFade(elOptions);
     }
 
     function goNext(){
@@ -1462,6 +1833,10 @@
     elBack.addEventListener("click", goBack);
 
     elApplyAreaBtn.addEventListener("click", ()=>{
+      elAreaCustomWrap.classList.remove("pulse");
+      void elAreaCustomWrap.offsetWidth;
+      elAreaCustomWrap.classList.add("pulse");
+
       const { area, height } = updateAreaLive();
       const minA = 40, maxA = 300;
       const norm = clamp01((area - minA) / (maxA - minA));
@@ -1476,6 +1851,125 @@
       goNext();
     });
 
+    // --- Modal + Mailto (inkl. aller Ergebnisse) ---
+    function openModal(){
+      elLeadError.classList.remove("isOpen");
+      elModalOverlay.classList.add("isOpen");
+      elModalOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(()=> elLeadName.focus(), 60);
+    }
+    function closeModal(){
+      elModalOverlay.classList.remove("isOpen");
+      elModalOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    elCtaOpen.addEventListener("click", ()=>{ openModal(); });
+    elModalClose.addEventListener("click", closeModal);
+    elModalCancel.addEventListener("click", closeModal);
+    elModalOverlay.addEventListener("click", (e)=>{
+      if (e.target === elModalOverlay) closeModal();
+    });
+    window.addEventListener("keydown", (e)=>{
+      if (e.key === "Escape" && elModalOverlay.classList.contains("isOpen")) closeModal();
+    });
+
+    function isValidEmail(s){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || "").trim());
+    }
+
+    function buildAnswerSummary(){
+      const act = activeSteps();
+      const lines = [];
+      for (const step of act){
+        if (step.id === "result") continue;
+        const ans = state.answers[step.id];
+        if (!ans) continue;
+
+        let valueText = ans.label ?? "";
+        if (step.id === "area" && ans.dims){
+          valueText = `${ans.label} | Wohnfläche: ${Math.round(ans.dims.area)} m² | Deckenhöhe: ${String(ans.dims.height).replace(".",",")} m`;
+        }
+        lines.push(`- ${step.question}: ${valueText}`);
+      }
+      return lines.join("\n");
+    }
+
+    function buildResultSummary(){
+      const { total, tech } = computeTotal();
+      const b = breakdown(total, tech);
+
+      const lines = [
+        "ERGEBNIS (Budgetrechner)",
+        `Gesamtkosten (unverbindlich): ${euro(total)}`,
+        "",
+        "Kostenaufteilung:",
+        `- Wärmepumpe (Gerät + Zubehör): ${euro(b.device)}`,
+        `- Installation / Hydraulik / Montage: ${euro(b.install)}`,
+        `- Elektroarbeiten (Anschluss / Absicherung): ${euro(b.elec)}`,
+        `- Umbauten am Heizsystem: ${euro(b.system)}`,
+        `- Planung / Inbetriebnahme / Einregulierung: ${euro(b.plan)}`,
+        "",
+        "Technische Orientierung:",
+        `- Überschlägige Heizleistung: ${tech.kw.toFixed(1).replace(".",",")} kW`,
+        `- JAZ (vereinfachter Ansatz): ${tech.jaz.toFixed(2).replace(".",",")}`,
+        `- Geschätzter Stromverbrauch pro Jahr: ${tech.kwh_el.toLocaleString("de-DE")} kWh`,
+        `- Geschätzte Stromkosten pro Jahr: ${euro(tech.cost)}`,
+      ];
+      return lines.join("\n");
+    }
+
+    function buildMailto(name, email, phone){
+      const now = new Date();
+      const ts = now.toLocaleString("de-DE");
+
+      const subject = `Wärmepumpen-Anfrage – Ergebnis aus Budgetrechner (${name})`;
+
+      const body = [
+        "Hallo EliteBau Hamburg,",
+        "",
+        "ich habe den Wärmepumpen-Budgetrechner genutzt und möchte eine Vor-Ort-Einschätzung bzw. ein Angebot anfragen.",
+        "",
+        "Kontaktdaten:",
+        `- Name: ${name}`,
+        `- E-Mail: ${email}`,
+        phone ? `- Telefon: ${phone}` : "- Telefon: (nicht angegeben)",
+        "",
+        buildResultSummary(),
+        "",
+        "Eingaben im Rechner:",
+        buildAnswerSummary(),
+        "",
+        `Zeitpunkt der Anfrage: ${ts}`,
+        "",
+        "Hinweis: Das Ergebnis ist unverbindlich und dient als Orientierung.",
+      ].join("\n");
+
+      const mailto = `mailto:${encodeURIComponent(LEAD_TO_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      return mailto;
+    }
+
+    elLeadSend.addEventListener("click", ()=>{
+      const name = String(elLeadName.value || "").trim();
+      const email = String(elLeadEmail.value || "").trim();
+      const phone = String(elLeadPhone.value || "").trim();
+      const consent = elLeadConsent.checked === true;
+
+      if (!name || !isValidEmail(email) || !consent){
+        elLeadError.classList.add("isOpen");
+        return;
+      }
+      elLeadError.classList.remove("isOpen");
+
+      const link = buildMailto(name, email, phone);
+      closeModal();
+      window.location.href = link;
+    });
+
+    // Initial
+    setRangeFill(elAreaRange);
+    setRangeFill(elHeightRange);
     render();
   </script>
 </body>
